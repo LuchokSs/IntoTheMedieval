@@ -1,26 +1,19 @@
 import pygame
 
-from fieldClass import Field
-from globals import FPS, FIELD_SIZE
+from fieldClass import field_mode
+from globals import FPS, FIELD_SIZE, MODES
 
 
 if __name__ == '__main__':
     pygame.init()
-    field = pygame.display.set_mode(FIELD_SIZE)
-
-    board = Field()
+    main_screen = pygame.display.set_mode(FIELD_SIZE)
 
     running = True
 
+    mode = MODES['FIELD']
+
     while running:
-        pygame.display.flip()
-
-        field.fill((0, 0, 0))
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                board.cell_clicked(event.pos)
-
-        board.draw_field(field)
+        if mode == MODES['START_MENU']:
+            pass
+        if mode == MODES['FIELD']:
+            running = field_mode(main_screen)

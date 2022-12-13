@@ -5,6 +5,26 @@ from secondary import load_image
 import pygame
 
 
+def field_mode(main_screen, *args, **kwargs):
+    board = Field()
+
+    running = True
+
+    while running:
+        pygame.display.flip()
+
+        main_screen.fill((0, 0, 0))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                return running
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                board.cell_clicked(event.pos)
+
+        board.draw_field(main_screen)
+
+
 class Field:
     def __init__(self):
         self.field = []
