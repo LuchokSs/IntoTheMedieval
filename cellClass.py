@@ -3,8 +3,6 @@ import pygame
 from globals import CELL_SIZE
 from secondary import load_image
 
-a = 22
-
 
 class Cell:
 
