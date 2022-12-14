@@ -1,6 +1,8 @@
+import random
+
 import pygame
 
-from globals import CELL_SIZE
+from globals import CELL_SIZE, CELL_TYPES
 from secondary import load_image
 
 
@@ -10,16 +12,16 @@ class Cell:
 
     content = None
 
-    def __init__(self, points, pos, imageName=None):
+    def __init__(self, points, pos, cell_type_id=None):
         self.points = points
 
-        if imageName is None:
+        if cell_type_id is None:
             self.sprite = pygame.surface.Surface(CELL_SIZE)
             pygame.draw.polygon(self.sprite, 'white', points, 5)
         else:
-            imageName = 'Безымянный.png'
-            self.sprite = load_image(imageName, colorkey='black')
-
+            self.sprite = \
+                load_image(f'''cell_images\\{CELL_TYPES[cell_type_id]
+                }\\{CELL_TYPES[cell_type_id]}_{random.randint(1, 3)}.png''', colorkey='black')
         self.pos = pos
 
     def draw_cell(self, surface):
