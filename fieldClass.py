@@ -6,6 +6,8 @@ import pygame
 
 
 def field_mode(main_screen, *args, **kwargs):
+    """Функция с игровым цЫклом поля."""
+
     board = Field()
 
     running = True
@@ -26,6 +28,8 @@ def field_mode(main_screen, *args, **kwargs):
 
 
 class Field:
+    """Класс поля."""
+
     def __init__(self):
         self.field = []
 
@@ -40,12 +44,19 @@ class Field:
                 self.field[x].append(Cell(points, pos))
 
     def draw_field(self, surface):
+
+        """Изображает поле на указанном хосте."""
+
         for row in self.field:
             for cell in row:
                 cell.draw_cell(surface)
 
     def cell_clicked(self, pos):
+
+        """Обработка событий нажатия кнопки. Получает на вход координаты в виде tuple"""
+
         for row in self.field:
             for cell in row:
                 if cell.is_clicked(pos):
                     cell.sprite = load_image('Безымянный.png', colorkey='black')
+                    # Р.S. На данный момент в качестве спрайта по умолчанию берется Безымянный.png

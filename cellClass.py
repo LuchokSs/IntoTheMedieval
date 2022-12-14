@@ -5,6 +5,8 @@ from secondary import load_image
 
 
 class Cell:
+    """Класс клетки
+        Хранит в себе всю информацию о ней."""
 
     content = None
 
@@ -21,10 +23,16 @@ class Cell:
         self.pos = pos
 
     def draw_cell(self, surface):
+
+        """Изображает клетку на поле. Черный цвет - цвет фона (Предварительно)."""
+
         self.sprite.set_colorkey('black')
         surface.blit(self.sprite, (*self.pos, *CELL_SIZE))
 
     def is_clicked(self, pos):
+
+        """Возвращает информацию о том, нажата ли клетка."""
+
         x, y = pos
         x = x - self.pos[0] - CELL_SIZE[0] // 2
         y = y - self.pos[1] - CELL_SIZE[1] // 2

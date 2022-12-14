@@ -11,6 +11,8 @@ if __name__ == '__main__':
     running = True
 
     mode = MODES['FIELD']
+    # В зависимости от Mod'а игры запускается определенная функция.
+    # По умолчанию будет стоять START_MENU, когда оно вообще будет
 
     while running:
         if mode == MODES['START_MENU']:
