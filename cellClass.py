@@ -20,7 +20,7 @@ class Cell:
             pygame.draw.polygon(self.sprite, 'white', points, 5)
         else:
             self.sprite = \
-                load_image(f'''cell_images\\{CELL_TYPES[cell_type_id]
+                load_image(f'''data\\cell_images\\{CELL_TYPES[cell_type_id]
                 }\\{CELL_TYPES[cell_type_id]}_{random.randint(1, 3)}.png''', colorkey='black')
         self.pos = pos
 
