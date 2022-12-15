@@ -33,7 +33,7 @@ class Field:
     """Класс поля."""
 
     patterns_name = ["HILLS_PATTERNS"]  # WIP , "LAKE_PATTERNS", "FOREST_PATTERNS", "CITY_PATTERNS"
-    patterns_num = 1
+    patterns_num = 4
 
     def __init__(self):
         self.field = \
