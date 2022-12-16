@@ -7,6 +7,9 @@ from secondary import load_image
 import pygame
 
 
+LAST_CLICKED = None
+
+
 def field_mode(main_screen, *args, **kwargs):
     """Функция с игровым цЫклом поля."""
 
@@ -61,10 +64,13 @@ class Field:
 
     def cell_clicked(self, pos):
 
-        """Обработка событий нажатия кнопки. Получает на вход координаты в виде tuple"""
+        """Обработка событий нажатия кнопки. Получает на вход координаты в виде tuple."""
 
         for row in self.field:
             for cell in row:
                 if cell.is_clicked(pos):
-                    cell.sprite = load_image('Безымянный.png', colorkey='black')
-                    # Р.S. На данный момент в качестве спрайта по умолчанию берется Безымянный.png
+                    global LAST_CLICKED
+                    if LAST_CLICKED is not None:
+                        LAST_CLICKED.clicked = False
+                    cell.clicked = True
+                    LAST_CLICKED = cell

@@ -1,6 +1,10 @@
 import os
+
 import sys
+
 import pygame
+
+from PIL import Image
 
 
 def load_image(name: str, colorkey=None) -> pygame.surface:
@@ -17,3 +21,15 @@ def load_image(name: str, colorkey=None) -> pygame.surface:
     else:
         image = image.convert_alpha()
     return image
+
+
+def pil_image_to_surface(image, direction=True):
+
+    """PIL >> SURFACE if direction else SURFACE >> PIL"""
+
+    if not direction:
+        str_format = 'RGBA'
+        raw_str = pygame.image.tostring(image, str_format, False)
+        return Image.frombytes(str_format, image.get_size(), raw_str)
+
+    return pygame.image.fromstring(image.tobytes(), image.size, image.mode).convert()
