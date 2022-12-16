@@ -2,15 +2,21 @@ import random
 
 import pygame
 
+from PIL import Image, ImageDraw
+
 from globals import CELL_SIZE, CELL_TYPES
-from secondary import load_image
+from secondary import load_image, pil_image_to_surface
 
 
 class Cell:
+
     """Класс клетки
         Хранит в себе всю информацию о ней."""
 
     content = None
+    clicked = False
+    tick = 0
+    animation_direction = True
 
     def __init__(self, points, pos, cell_type_id=None):
         self.points = points
@@ -27,9 +33,25 @@ class Cell:
     def draw_cell(self, surface):
 
         """Изображает клетку на поле. Черный цвет - цвет фона (Предварительно)."""
+        image = self.sprite
 
-        self.sprite.set_colorkey('black')
-        surface.blit(self.sprite, (*self.pos, *CELL_SIZE))
+        if self.clicked:
+            image = pil_image_to_surface(image, direction=False)
+            data = image.load()
+            for x in range(image.size[0]):
+                for y in range(image.size[1]):
+                    data[x, y] = tuple(map(
+                        lambda el: (el + int(20 * self.tick)) if (el + 20 * self.tick) < 255 else 255, data[x, y]))
+            color = data[0, 0]
+            image = pil_image_to_surface(image)
+            image.set_colorkey(color)
+            surface.blit(image, (*self.pos, *CELL_SIZE))
+            self.tick = (self.tick + 0.08) if self.animation_direction else (self.tick - 0.05)
+            if self.tick > 5 and self.animation_direction or self.tick < 0.5 and not self.animation_direction:
+                self.animation_direction = not self.animation_direction
+            return
+        image.set_colorkey('black')
+        surface.blit(image, (*self.pos, *CELL_SIZE))
 
     def is_clicked(self, pos):
 
