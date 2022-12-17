@@ -1,10 +1,16 @@
+import json
+
+
 class Unit:
-    def __init__(self, hp, damage, range_of_attack, range_of_feet, image):
-        self.hp = hp
-        self.damage = damage
-        self.range_of_attack = range_of_attack
-        self.range_of_feet = range_of_feet
-        self.image = image
+    def __init__(self, name_of_json_file):
+        with open(name_of_json_file, "r") as read_file:
+            data = json.load(read_file)
+            self.hp = data[0]
+            self.damage = data[1]
+            self.range_of_attack = data[2]
+            self.range_of_feet = data[3]
+            self.image = data[4]
+            read_file.close()
 
     def change_hp(self, damage_given):
         self.hp -= damage_given
