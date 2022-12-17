@@ -35,6 +35,8 @@ class Cell:
         """Изображает клетку на поле. Черный цвет - цвет фона (Предварительно)."""
         image = self.sprite
 
+        # В этом месте будет добавление рисунка unitа из self.content на image.
+
         if self.clicked:
             image = pil_image_to_surface(image, direction=False)
             data = image.load()
