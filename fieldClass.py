@@ -1,8 +1,9 @@
 import random
 
 from cellClass import Cell
-from globals import CELL_SIZE
+from globals import CELL_SIZE, EXIT_MENU_EVENT
 from secondary import load_image
+from interfaceClass import Interface
 
 import pygame
 
@@ -13,9 +14,9 @@ LAST_CLICKED = None
 def field_mode(main_screen, *args, **kwargs):
     """Функция с игровым цЫклом поля."""
 
-    board = Field()
-
     running = True
+
+    board = Field(main_screen, running)
 
     while running:
         pygame.display.flip()
@@ -24,12 +25,13 @@ def field_mode(main_screen, *args, **kwargs):
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
-                return running
+                return 3
             if event.type == pygame.MOUSEBUTTONDOWN:
-                board.cell_clicked(event.pos)
+                board.clicked(event.pos)
+            if event == EXIT_MENU_EVENT:
+                return 0
 
-        board.draw_field(main_screen)
+        board.draw_field()
 
 
 class Field:
@@ -38,7 +40,13 @@ class Field:
     patterns_name = ["HILLS_PATTERNS"]  # WIP , "LAKE_PATTERNS", "FOREST_PATTERNS", "CITY_PATTERNS"
     patterns_num = 4
 
-    def __init__(self):
+    def __init__(self, surface, running):
+        self.surface = surface
+        self.running = running
+
+        self.interface = Interface(self.surface)
+        self.interface.update()
+
         self.field = \
             open(f'''.\\data\\field_patterns\\{self.patterns_name[random.randint(0, len(self.patterns_name) - 1)]}/{
         random.randint(1, self.patterns_num)}.txt''',
@@ -54,15 +62,17 @@ class Field:
                 pos = 100 + xs * (row + cell), 350 + ys * (row - cell)
                 self.field[row][cell] = Cell(points, pos, int(self.field[row][cell]))
 
-    def draw_field(self, surface):
+    def draw_field(self):
 
         """Изображает поле на указанном хосте."""
 
         for row in self.field:
             for cell in row:
-                cell.draw_cell(surface)
+                cell.draw_cell(self.surface)
 
-    def cell_clicked(self, pos):
+        self.interface.update()
+
+    def clicked(self, pos):
 
         """Обработка событий нажатия кнопки. Получает на вход координаты в виде tuple."""
 
@@ -74,6 +84,8 @@ class Field:
                         LAST_CLICKED.clicked = False
                     cell.clicked = True
                     LAST_CLICKED = cell
+
+        self.interface.interface_clicked(pos)
 
     def set_unit(self, pos, unit_name):
 

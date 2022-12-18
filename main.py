@@ -16,6 +16,8 @@ if __name__ == '__main__':
 
     while running:
         if mode == MODES['START_MENU']:
-            pass
+            running = False
         if mode == MODES['FIELD']:
-            running = field_mode(main_screen)
+            mode = field_mode(main_screen)
+        if mode == MODES['EXIT']:
+            running = False
