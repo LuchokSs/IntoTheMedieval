@@ -2,6 +2,7 @@ import pygame
 
 from fieldClass import field_mode
 from globals import FPS, FIELD_SIZE, MODES
+from menuClass import start_screen
 
 
 if __name__ == '__main__':
@@ -10,13 +11,12 @@ if __name__ == '__main__':
 
     running = True
 
-    mode = MODES['FIELD']
+    mode = MODES['START_MENU']
     # В зависимости от Mod'а игры запускается определенная функция.
-    # По умолчанию будет стоять START_MENU, когда оно вообще будет
 
     while running:
         if mode == MODES['START_MENU']:
-            running = False
+            mode = start_screen(main_screen)
         if mode == MODES['FIELD']:
             mode = field_mode(main_screen)
         if mode == MODES['EXIT']:
