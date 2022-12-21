@@ -1,8 +1,9 @@
 import random
 
 from cellClass import Cell
-from globals import CELL_SIZE
+from globals import CELL_SIZE, UNITS
 from secondary import load_image
+from unitClass import Unit
 
 import pygame
 
@@ -74,3 +75,10 @@ class Field:
                         LAST_CLICKED.clicked = False
                     cell.clicked = True
                     LAST_CLICKED = cell
+
+    def set_unit(self, pos, unit_name):
+
+        """Загрузка юнита из json файла, расположенного по пути, указанному в глобальном словаре,
+                  в соответствии с именем юнита на указанную точку."""
+
+        board[pos[0]][pos[1]].content = Unit(UNITS[unit_name])
