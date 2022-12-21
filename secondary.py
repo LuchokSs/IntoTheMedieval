@@ -40,7 +40,7 @@ def pil_image_to_surface(image, direction=True):
 
 
 def new_unit(name_of_unit, health, damage, range_of_attack, movement_range, image):
-    with open(f"{name_of_unit}.json", "w") as write_file:
+    with open(f"data/{name_of_unit}.json", "w") as write_file:
         data = [health, damage, range_of_attack, movement_range, image]
         json.dump(data, write_file)
         UNITS[name_of_unit] = f"{name_of_unit}.json"
