@@ -46,6 +46,9 @@ class Cell:
             image = pil_image_to_surface(image)
             image.set_colorkey(color)
             surface.blit(image, (*self.pos, *CELL_SIZE))
+            """Предварительная версия отрисовки персонажа на клетке"""
+            if content:
+                pass
             self.tick = (self.tick + 0.08) if self.animation_direction else (self.tick - 0.05)
             if self.tick > 5 and self.animation_direction or self.tick < 0.5 and not self.animation_direction:
                 self.animation_direction = not self.animation_direction
