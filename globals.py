@@ -7,3 +7,7 @@ MODES = {'START_MENU': 0,   # Словарь хранит соответстви
          'END_MENU': 2}
 
 CELL_TYPES = ['FIELD', 'HOUSE', 'FOREST', 'HILL', 'WATER']
+
+UNITS = {'first': 'путь',
+         'second': 'путь',
+         'third': 'путь'}
