@@ -1,58 +1,52 @@
 import pygame
-import sys
-from globals import FIELD_SIZE, MODES
-
-
-class Menu:
-    def __init__(self, screen, buttons):
-        self.window = screen
-        self.buttons = buttons
-        pygame.font.init()
-        self.main_font = pygame.font.Font(None, 48)
-        self.screen = pygame.Surface(FIELD_SIZE)
-
-    def render(self, window, num_btn):
-        for btn in self.buttons:
-            if num_btn == btn[5]:
-                window.blit(self.main_font.render(btn[2], 1, btn[4]), (btn[0], btn[1]))
-            else:
-                window.blit(self.main_font.render(btn[2], 1, btn[3]), (btn[0], btn[1]))
-
-    def menu(self):
-        done = True
-        num = 0
-        while done:
-            self.window.fill((0, 100, 200))
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    sys.exit()
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_UP:
-                        if num > 0:
-                            num -= 1
-                    if event.key == pygame.K_DOWN:
-                        if num < len(self.buttons):
-                            num += 1
-                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                    if num == 0:
-                        done = False
-                    if num == 1:
-                        sys.exit()
-
-            mp = pygame.mouse.get_pos()
-            for btn in self.buttons:
-                if btn[0] < mp[0] < btn[0] + 155 and btn[1] < mp[1] < btn[1] + 50:
-                    num = btn[5]
-            self.render(self.screen, num)
-
-            self.window.blit(self.screen, (0, 0))
-            pygame.display.flip()
+from globals import MODES
 
 
 def start_screen(main_screen):
-    buttons = [(450, 300, "Play", (250, 250, 30), (250, 30, 250), 0),
-               (450, 350, "Quit", (250, 250, 30), (250, 30, 250), 1)]
-    game = Menu(main_screen, buttons)
-    game.menu()
-    return MODES['FIELD']
+    game = Menu()
+
+    while True:
+        pos = pygame.mouse.get_pos()
+        main_screen.fill((0, 100, 200))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return MODES["EXIT"]
+            for elem in game.all_sprites:
+                if elem.rect.collidepoint(pos):
+                    elem.image = game.render(elem)
+                    if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                        if elem.name == "Play":
+                            return MODES['FIELD']
+                        elif elem.name == "Quit":
+                            return MODES["EXIT"]
+                else:
+                    elem.image = game.unrender(elem)
+
+        game.all_sprites.draw(main_screen)
+        pygame.display.flip()
+
+
+class Menu:
+    def __init__(self):
+        pygame.font.init()
+        self.main_font = pygame.font.Font(None, 48)
+        self.all_sprites = pygame.sprite.Group()
+        sprite = pygame.sprite.Sprite()
+        sprite.image = self.main_font.render("Play", 1, (250, 250, 30))
+        sprite.rect = sprite.image.get_rect()
+        sprite.rect.x, sprite.rect.y = 425, 250
+        sprite.name = "Play"
+        self.all_sprites.add(sprite)
+        sprite = pygame.sprite.Sprite()
+        sprite.image = self.main_font.render("Quit", 1, (250, 250, 30))
+        sprite.rect = sprite.image.get_rect()
+        sprite.rect.x, sprite.rect.y = 425, 350
+        sprite.name = "Quit"
+        self.all_sprites.add(sprite)
+
+    def render(self, elem):
+        return self.main_font.render(elem.name, 1, (250, 30, 250))
+
+    def unrender(self, elem):
+        return self.main_font.render(elem.name, 1, (250, 250, 30))
