@@ -139,7 +139,7 @@ class Field:
         if cell is None:
             return False
 
-        if (marked and cell.marked) or not marked:
+        if (marked and cell.marked and cell.content is None) or not marked:
             with open(UNITS[unit_name], "r") as file:
                 cell.content = json.load(file)
                 return True
