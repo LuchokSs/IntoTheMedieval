@@ -33,7 +33,7 @@ class Cell:
     def draw_cell(self, surface):
 
         """Изображает клетку на поле. Черный цвет - цвет фона (Предварительно)."""
-        image = self.sprite
+        image = self.sprite.copy()
 
         # В этом месте будет добавление рисунка unitа из self.content на image.
 
@@ -47,12 +47,16 @@ class Cell:
             color = data[0, 0]
             image = pil_image_to_surface(image)
             image.set_colorkey(color)
-            surface.blit(image, (*self.pos, *CELL_SIZE))
             self.tick = (self.tick + 0.08) if self.animation_direction else (self.tick - 0.05)
             if self.tick > 5 and self.animation_direction or self.tick < 0.5 and not self.animation_direction:
                 self.animation_direction = not self.animation_direction
-            return
-        image.set_colorkey('black')
+        else:
+            image.set_colorkey('black')
+
+        if self.content is not None:
+            unit_image = self.content.get_image()
+            image.blit(unit_image, unit_image.get_rect())
+
         surface.blit(image, (*self.pos, *CELL_SIZE))
 
     def is_clicked(self, pos):
