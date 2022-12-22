@@ -40,6 +40,10 @@ def field_mode(main_screen, *args, **kwargs):
 
         board.draw_field()
 
+    for row in board.field:
+        for cell in row:
+            cell.marked = False
+
     while running:
         pygame.display.flip()
 
