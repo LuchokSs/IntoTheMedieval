@@ -12,6 +12,10 @@ MODES = {'START_MENU': 0,   # Словарь хранит соответстви
 
 CELL_TYPES = ['FIELD', 'FOREST', 'HOUSE', 'HILL', 'WATER']
 
+MOVEMENT_TYPES = {'grounded': 0,
+                  'flying': 1,
+                  'floating': 2}
+
 
 """EVENTS"""
 
