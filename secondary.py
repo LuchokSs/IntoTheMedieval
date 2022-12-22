@@ -39,9 +39,6 @@ def pil_image_to_surface(image, direction=True):
     return pygame.image.fromstring(image.tobytes(), image.size, image.mode).convert()
 
 
-def new_unit(name_of_unit, health, damage, range_of_attack, movement_range, image):
-    with open(f"data/units/{name_of_unit}.json", "w") as write_file:
-        data = [health, damage, range_of_attack, movement_range, image]
-        json.dump(data, write_file)
-        UNITS[name_of_unit] = f"{name_of_unit}.json"
-        write_file.close()
+def new_unit(unit):
+    with open(UNITS[unit.name], "w") as write_file:
+        json.dump(unit, write_file)

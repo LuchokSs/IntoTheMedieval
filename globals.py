@@ -8,6 +8,6 @@ MODES = {'START_MENU': 0,   # Словарь хранит соответстви
 
 CELL_TYPES = ['FIELD', 'HOUSE', 'FOREST', 'HILL', 'WATER']
 
-UNITS = {'first': 'путь',
-         'second': 'путь',
-         'third': 'путь'}
+UNITS = {'warrior': ".\\data\\units\\warrior\\unit.json",
+         'shield': 'way2',
+         'archer': 'way3'}
