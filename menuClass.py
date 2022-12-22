@@ -21,7 +21,7 @@ def start_screen(main_screen):
                         elif elem.name == "Quit":
                             return MODES["EXIT"]
                 else:
-                    elem.image = game.unrender(elem)
+                    elem.image = game.render_selected(elem)
 
         game.all_sprites.draw(main_screen)
         pygame.display.flip()
@@ -32,12 +32,14 @@ class Menu:
         pygame.font.init()
         self.main_font = pygame.font.Font(None, 48)
         self.all_sprites = pygame.sprite.Group()
+
         sprite = pygame.sprite.Sprite()
         sprite.image = self.main_font.render("Play", 1, (250, 250, 30))
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x, sprite.rect.y = 425, 250
         sprite.name = "Play"
         self.all_sprites.add(sprite)
+
         sprite = pygame.sprite.Sprite()
         sprite.image = self.main_font.render("Quit", 1, (250, 250, 30))
         sprite.rect = sprite.image.get_rect()
@@ -48,5 +50,5 @@ class Menu:
     def render(self, elem):
         return self.main_font.render(elem.name, 1, (250, 30, 250))
 
-    def unrender(self, elem):
+    def render_selected(self, elem):
         return self.main_font.render(elem.name, 1, (250, 250, 30))
