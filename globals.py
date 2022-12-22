@@ -7,7 +7,8 @@ FIELD_SIZE = (1000, 700)
 
 MODES = {'START_MENU': 0,   # Словарь хранит соответствие названия состояния игры и численного кода состояния.
          'FIELD': 1,        # НЕ МЕНЯТЬ БЕЗ ПРЕДУПРЕЖДЕНИЯ
-         'END_MENU': 2}
+         'END_MENU': 2,
+         'EXIT': 3}
 
 CELL_TYPES = ['FIELD', 'HOUSE', 'FOREST', 'HILL', 'WATER']
 

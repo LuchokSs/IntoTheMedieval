@@ -29,7 +29,7 @@ def field_mode(main_screen, *args, **kwargs):
             if event.type == pygame.QUIT:
                 return 3
             if event.type == pygame.MOUSEBUTTONDOWN:
-                board.cell_clicked(event.pos)
+                board.clicked(event.pos)
             if event == EXIT_MENU_EVENT:
                 return 0
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
@@ -88,14 +88,12 @@ class Field:
         """Обработка событий нажатия. Получает на вход координаты в виде tuple."""
 
         cell = self.find_clicked_cell(pos)
-        if cell is None:
-            return
-
-        global LAST_CLICKED
-        if LAST_CLICKED is not None:
-            LAST_CLICKED.clicked = False
-        cell.clicked = True
-        LAST_CLICKED = cell
+        if cell is not None:
+            global LAST_CLICKED
+            if LAST_CLICKED is not None:
+                LAST_CLICKED.clicked = False
+            cell.clicked = True
+            LAST_CLICKED = cell
 
         self.interface.interface_clicked(pos)
 
