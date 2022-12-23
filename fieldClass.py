@@ -8,6 +8,7 @@ from interfaceClass import Interface
 import pygame
 
 
+STAGE = 0
 LAST_CLICKED = None
 
 
@@ -57,6 +58,9 @@ def field_mode(main_screen, *args, **kwargs):
             if event == EXIT_MENU_EVENT:
                 return 0
 
+        if STAGE == 0:
+            pass
+
         board.draw_field()
 
 
@@ -65,6 +69,7 @@ class Field:
 
     patterns_name = ["HILLS_PATTERNS"]  # WIP , "LAKE_PATTERNS", "FOREST_PATTERNS", "CITY_PATTERNS"
     patterns_num = 3
+    player_health = 4
 
     def __init__(self, surface, running):
         pygame.font.init()
@@ -73,7 +78,7 @@ class Field:
         self.surface = surface
         self.running = running
 
-        self.interface = Interface(self.surface)
+        self.interface = Interface(self.surface, self.player_health)
         self.interface.update()
 
         self.field = \
