@@ -1,7 +1,8 @@
 import random
 
 from cellClass import Cell
-from globals import squad, UNITS, CELL_SIZE, EXIT_MENU_EVENT
+from globals import squad, UNITS, CELL_SIZE, EXIT_MENU_EVENT, MOVING_UNIT_EVENT
+from unitClass import Unit
 import json_tricks as json
 from interfaceClass import Interface
 
@@ -16,6 +17,7 @@ def field_mode(main_screen, *args, **kwargs):
     """Функция с игровым цЫклом поля."""
 
     running = True
+    moving_phase = False
 
     board = Field(main_screen, running)
 
@@ -41,9 +43,7 @@ def field_mode(main_screen, *args, **kwargs):
 
         board.draw_field()
 
-    for row in board.field:
-        for cell in row:
-            cell.marked = False
+    board.clear_marks()
 
     while running:
         pygame.display.flip()
@@ -53,13 +53,17 @@ def field_mode(main_screen, *args, **kwargs):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return 3
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event == MOVING_UNIT_EVENT:
+                board.mark_range(LAST_CLICKED.content.movement_range, LAST_CLICKED.crds)
+                moving_phase = True
+            if event.type == pygame.MOUSEBUTTONDOWN and moving_phase:
+                if board.move_unit(LAST_CLICKED, event.pos):
+                    moving_phase = False
+                    board.clear_marks()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
                 board.clicked(event.pos)
             if event == EXIT_MENU_EVENT:
                 return 0
-
-        if STAGE == 0:
-            pass
 
         board.draw_field()
 
@@ -95,7 +99,7 @@ class Field:
             for cell in range(len(self.field[row])):
                 points = ((2 * xs, ys), (xs, 2 * ys), (0, ys), (xs, 0))
                 pos = 100 + xs * (row + cell), 350 + ys * (row - cell)
-                self.field[row][cell] = Cell(points, pos, int(self.field[row][cell]))
+                self.field[row][cell] = Cell(points, pos, int(self.field[row][cell]), (row, cell))
 
         for i in marked_list:
             pos = i.split()
@@ -133,6 +137,12 @@ class Field:
             cell.clicked = True
             LAST_CLICKED = cell
 
+            if cell.content is not None:
+                self.interface.show_unit_interface(cell.content)
+
+        if LAST_CLICKED.content is not None:
+            self.interface.unit_management(pos)
+
         self.interface.interface_clicked(pos)
 
     def set_unit(self, pos, unit_name, marked=False):
@@ -149,3 +159,45 @@ class Field:
                 cell.content = json.load(file)
                 return True
         return False
+
+    def move_unit(self, unit, pos):
+        cell = self.find_clicked_cell(pos)
+        if cell is None:
+            return False
+        if cell.marked:
+            self.move_content(unit, cell)
+            global LAST_CLICKED
+            LAST_CLICKED.clicked = False
+        return True
+
+    def clear_marks(self):
+        for row in self.field:
+            for cell in row:
+                cell.marked = False
+
+    def mark_range(self, range, curr_cell, movement_type=0):
+        if range == 0:
+            return
+        try:
+            if self.field[curr_cell[0]][curr_cell[1]].marked:
+                return
+        except IndexError:
+            return
+        if movement_type == 0:
+            if self.field[curr_cell[0]][curr_cell[1]].cell_type_id != 0:
+                return
+            else:
+                self.field[curr_cell[0]][curr_cell[1]].marked = True
+                self.mark_range(range - 1, [curr_cell[0] - 1, curr_cell[1]], movement_type)
+                self.mark_range(range - 1, [curr_cell[0], curr_cell[1] - 1], movement_type)
+                self.mark_range(range - 1, [curr_cell[0] + 1, curr_cell[1]], movement_type)
+                self.mark_range(range - 1, [curr_cell[0], curr_cell[1] + 1], movement_type)
+        if movement_type == 1:
+            self.field[curr_cell[0]][curr_cell[1]].marked = True
+            self.mark_range(range - 1, [curr_cell[0] - 1, curr_cell[1]], movement_type)
+            self.mark_range(range - 1, [curr_cell[0], curr_cell[1] - 1], movement_type)
+            self.mark_range(range - 1, [curr_cell[0] + 1, curr_cell[1]], movement_type)
+            self.mark_range(range - 1, [curr_cell[0], curr_cell[1] + 1], movement_type)
+
+    def move_content(self, cell1, cell2):
+        cell1.content, cell2.content = cell2.content, cell1.content

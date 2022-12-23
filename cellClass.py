@@ -19,8 +19,11 @@ class Cell:
     tick = 0
     animation_direction = True
 
-    def __init__(self, points, pos, cell_type_id=None):
+    def __init__(self, points, pos, cell_type_id=None, indexes=(0, 0)):
         self.points = points
+        self.crds = indexes
+
+        self.cell_type_id = cell_type_id
 
         if cell_type_id is None:
             self.sprite = pygame.surface.Surface(CELL_SIZE)

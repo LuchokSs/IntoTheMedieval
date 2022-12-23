@@ -1,6 +1,6 @@
 import pygame
 from secondary import load_image, pil_image_to_surface
-from globals import EXIT_MENU_EVENT
+from globals import EXIT_MENU_EVENT, MOVING_UNIT_EVENT
 
 
 class Interface:
@@ -25,9 +25,26 @@ class Interface:
                        colorkey='black')
         self.images['player_healthBar'].rect = pygame.rect.Rect(860, 10, 140, 32)
 
+        self.images["moving_icon"] = pygame.sprite.Sprite(self.interface_sprites)
+        self.images["moving_icon"].image = load_image('data\\interface_images\\moving_icon.png', colorkey='black')
+        self.images["moving_icon"].rect = pygame.rect.Rect(10, 436, 150, 150)
+
+        self.images["spell_icon"] = pygame.sprite.Sprite(self.interface_sprites)
+        self.images["spell_icon"].image = load_image('data\\interface_images\\spell_icon.png', colorkey='black')
+        self.images["spell_icon"].rect = pygame.rect.Rect(10, 600, 450, 300)
+
     def update(self):
         self.interface_sprites.draw(self.surface)
 
     def interface_clicked(self, pos):
         if self.images['exit_button'].rect.collidepoint(pos):
             pygame.event.post(EXIT_MENU_EVENT)
+
+    def unit_management(self, pos):
+        if self.images['moving_icon'].rect.collidepoint(pos):
+            pygame.event.post(MOVING_UNIT_EVENT)
+
+    def show_unit_interface(self, unit):
+        pass
+        # self.images['spell_icon'].image = unit.spell_icon
+        # self.images['unit_info'].image = unit.info_image

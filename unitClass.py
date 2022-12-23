@@ -9,6 +9,7 @@ class Unit:
     movement_type = MOVEMENT_TYPES['grounded']
     name = ''
     image = ''
+    turns_left = {'move': True, 'spell': True}
 
     def get_image(self):
         return load_image(self.image, colorkey='black')
