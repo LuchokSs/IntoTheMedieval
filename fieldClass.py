@@ -113,6 +113,8 @@ class Field:
             for cell in row:
                 cell.draw_cell(self.surface)
 
+        if LAST_CLICKED is None or LAST_CLICKED.content is None:
+            self.interface.hide_unit_interface()
         self.interface.update()
 
     def find_clicked_cell(self, pos):
@@ -168,7 +170,6 @@ class Field:
             self.move_content(unit, cell)
             global LAST_CLICKED
             LAST_CLICKED.clicked = False
-            self.interface.hide_unit_interface()
         return True
 
     def clear_marks(self):
