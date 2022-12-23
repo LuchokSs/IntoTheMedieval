@@ -21,7 +21,7 @@ class Cell:
 
     def __init__(self, points, pos, cell_type_id=None):
         self.points = points
-
+        self.cell_type_id = cell_type_id
         if cell_type_id is None:
             self.sprite = pygame.surface.Surface(CELL_SIZE)
             pygame.draw.polygon(self.sprite, 'white', points, 5)
@@ -34,7 +34,7 @@ class Cell:
     def draw_cell(self, surface):
 
         """Изображает клетку на поле. Черный цвет - цвет фона (Предварительно)."""
-        image = self.sprite.copy()
+        image = self.sprite
 
         if self.marked:
             pygame.draw.polygon(image, (150, 150, 30),
@@ -51,16 +51,12 @@ class Cell:
             color = data[0, 0]
             image = pil_image_to_surface(image)
             image.set_colorkey(color)
+            surface.blit(image, (*self.pos, *CELL_SIZE))
             self.tick = (self.tick + 0.08) if self.animation_direction else (self.tick - 0.05)
             if self.tick > 5 and self.animation_direction or self.tick < 0.5 and not self.animation_direction:
                 self.animation_direction = not self.animation_direction
-        else:
-            image.set_colorkey('black')
-
-        if self.content is not None:
-            unit_image = self.content.get_image()
-            image.blit(unit_image, unit_image.get_rect())
-
+            return
+        image.set_colorkey('black')
         surface.blit(image, (*self.pos, *CELL_SIZE))
 
     def is_clicked(self, pos):
@@ -76,3 +72,51 @@ class Cell:
             return True
         else:
             return False
+
+    def move_unit(self, cell_of_unit, cell_of_movement):
+
+        """Перемещает песронажа класса Unit в указанную клетку, возвращает tuple новой позиции."""
+
+        cell_of_unit.content, cell_of_movement.content = cell_of_movement.content, cell_of_unit.content
+
+    def show_movement_range(self, pos, range_of_movement, field, movement_type=0, visited=[]):
+
+        """Подсвечивает все возможные для перемещения клетки."""
+
+        x, y = pos
+        if range_of_movement <= 0:
+            field[x][y].marked = True
+        else:
+            if field[x + 1][y].cell_type_id == movement_type == 0 and (x + 1, y) not in visited:
+                field[x + 1][y].marked = True
+                visited.append((x + 1, y))
+                self.show_movement_range((x + 1, y), range_of_movement - 1, field, movement_type, visited)
+            if field[x - 1][y].cell_type_id == movement_type == 0 and (x - 1, y) not in visited:
+                field[x - 1][y].marked = True
+                visited.append((x - 1, y))
+                self.show_movement_range((x - 1, y), range_of_movement - 1, field, movement_type, visited)
+            if field[x][y + 1].cell_type_id == movement_type == 0 and (x, y + 1) not in visited:
+                field[x][y + 1].marked = True
+                visited.append((x, y + 1))
+                self.show_movement_range((x, y + 1), range_of_movement - 1, field, movement_type, visited)
+            if field[x][y - 1].cell_type_id == movement_type == 0 and (x, y - 1) not in visited:
+                field[x][y - 1].marked = True
+                visited.append((x, y - 1))
+                self.show_movement_range((x, y - 1), range_of_movement - 1, field, movement_type, visited)
+            if movement_type == 1:
+                if [x + 1][y] not in visited:
+                    field[x + 1][y].marked = True
+                    visited.append((x + 1, y))
+                    self.show_movement_range((x + 1, y), range_of_movement - 1, field, movement_type, visited)
+                if [x - 1][y] not in visited:
+                    field[x - 1][y].marked = True
+                    visited.append((x - 1, y))
+                    self.show_movement_range((x - 1, y), range_of_movement - 1, field, movement_type, visited)
+                if [x][y + 1] not in visited:
+                    field[x][y + 1].marked = True
+                    visited.append((x, y + 1))
+                    self.show_movement_range((x, y + 1), range_of_movement - 1, field, movement_type, visited)
+                if [x][y - 1] not in visited:
+                    field[x][y + 1].marked = True
+                    visited.append((x, y - 1))
+                    self.show_movement_range((x, y + 1), range_of_movement - 1, field, movement_type, visited)
