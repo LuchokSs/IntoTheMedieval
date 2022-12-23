@@ -12,10 +12,15 @@ MODES = {'START_MENU': 0,   # Словарь хранит соответстви
 
 CELL_TYPES = ['FIELD', 'FOREST', 'HOUSE', 'HILL', 'WATER']
 
+MOVEMENT_TYPES = {'grounded': 0,
+                  'flying': 1,
+                  'floating': 2}
+
 
 """EVENTS"""
 
 EXIT_MENU_EVENT = pygame.event.Event(pygame.USEREVENT + 1)
+MOVING_UNIT_EVENT = pygame.event.Event(pygame.USEREVENT + 2)
 
 
 UNITS = {'warrior': ".\\data\\units\\warrior\\unit.json",
