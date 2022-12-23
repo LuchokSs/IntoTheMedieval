@@ -72,3 +72,51 @@ class Cell:
             return True
         else:
             return False
+
+    def move_unit(self, cell_of_unit, cell_of_movement):
+
+        """Перемещает песронажа класса Unit в указанную клетку, возвращает tuple новой позиции."""
+
+        cell_of_unit.content, cell_of_movement.content = cell_of_movement.content, cell_of_unit.content
+
+    def show_movement_range(self, pos, range_of_movement, movement_type=0, visited=[]):
+
+        """Подсвечивает все возможные для перемещения клетки."""
+
+        x, y = pos
+        if range_of_movement == 0:
+            self.field[[x][y]].marked = True
+        else:
+            if self.field[[x + 1][y]].cell_type_id == movement_type == 0 and [x + 1][y] not in visited:
+                self.field[[x + 1][y]].marked = True
+                visited.append([x + 1][y])
+                show_movement_range(tuple(x + 1, y), range_of_movement - 1, movement_type, visited)
+            if self.field[[x - 1][y]].cell_type_id == movement_type == 0 and [x - 1][y] not in visited:
+                self.field[[x - 1][y]].marked = True
+                visited.append([x - 1][y])
+                show_movement_range(tuple(x - 1, y), range_of_movement - 1, movement_type, visited)
+            if self.field[[x][y + 1]].cell_type_id == movement_type == 0 and [x][y + 1] not in visited:
+                self.field[[x][y + 1]].marked = True
+                visited.append([x][y + 1])
+                show_movement_range(tuple(x, y + 1), range_of_movement - 1, movement_type, visited)
+            if self.field[[x][y - 1]].cell_type_id == movement_type == 0 and [x][y - 1] not in visited:
+                self.field[[x][y - 1]].marked = True
+                visited.append([x][y - 1])
+                show_movement_range(tuple(x, y - 1), range_of_movement - 1, movement_type, visited)
+            if movement_type == 1:
+                if [x + 1][y] not in visited:
+                    self.field[[x + 1][y]].marked = True
+                    visited.append([x + 1][y])
+                    show_movement_range(tuple(x + 1, y), range_of_movement - 1, movement_type, visited)
+                if [x - 1][y] not in visited:
+                    self.field[[x - 1][y]].marked = True
+                    visited.append([x - 1][y])
+                    show_movement_range(tuple(x - 1, y), range_of_movement - 1, movement_type, visited)
+                if [x][y + 1] not in visited:
+                    self.field[[x][y + 1]].marked = True
+                    visited.append([x][y + 1])
+                    show_movement_range(tuple(x, y + 1), range_of_movement - 1, movement_type, visited)
+                if [x][y - 1] not in visited:
+                    self.field[[x][y + 1]].marked = True
+                    visited.append([x][y + 1])
+                    show_movement_range(tuple(x, y + 1), range_of_movement - 1, movement_type, visited)
