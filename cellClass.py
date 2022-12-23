@@ -15,6 +15,7 @@ class Cell:
 
     content = None
     clicked = False
+    marked = False
     tick = 0
     animation_direction = True
 
@@ -34,6 +35,11 @@ class Cell:
 
         """Изображает клетку на поле. Черный цвет - цвет фона (Предварительно)."""
         image = self.sprite
+
+        if self.marked:
+            pygame.draw.polygon(image, (150, 150, 30),
+                                ((0, CELL_SIZE[1] // 2), (CELL_SIZE[0] // 2, 0),
+                                 (CELL_SIZE[0], CELL_SIZE[1] // 2), (CELL_SIZE[0] // 2, CELL_SIZE[1])), 5)
 
         if self.clicked:
             image = pil_image_to_surface(image, direction=False)
