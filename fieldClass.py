@@ -168,6 +168,7 @@ class Field:
             self.move_content(unit, cell)
             global LAST_CLICKED
             LAST_CLICKED.clicked = False
+            self.interface.hide_unit_interface()
         return True
 
     def clear_marks(self):

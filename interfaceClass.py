@@ -26,11 +26,11 @@ class Interface:
         self.images['player_healthBar'].rect = pygame.rect.Rect(860, 10, 140, 32)
 
         self.images["moving_icon"] = pygame.sprite.Sprite(self.interface_sprites)
-        self.images["moving_icon"].image = load_image('data\\interface_images\\moving_icon.png', colorkey='black')
+        self.images["moving_icon"].image = load_image('data\\interface_images\\empty_moving_icon.png', colorkey='black')
         self.images["moving_icon"].rect = pygame.rect.Rect(10, 436, 150, 150)
 
         self.images["spell_icon"] = pygame.sprite.Sprite(self.interface_sprites)
-        self.images["spell_icon"].image = load_image('data\\interface_images\\spell_icon.png', colorkey='black')
+        self.images["spell_icon"].image = load_image('data\\interface_images\\empty_spell_icon.png', colorkey='black')
         self.images["spell_icon"].rect = pygame.rect.Rect(10, 600, 450, 300)
 
     def update(self):
@@ -45,6 +45,10 @@ class Interface:
             pygame.event.post(MOVING_UNIT_EVENT)
 
     def show_unit_interface(self, unit):
-        pass
+        self.images["moving_icon"].image = load_image('data\\interface_images\\moving_icon.png', colorkey='black')
         # self.images['spell_icon'].image = unit.spell_icon
         # self.images['unit_info'].image = unit.info_image
+
+    def hide_unit_interface(self):
+        self.images["moving_icon"].image = load_image('data\\interface_images\\empty_moving_icon.png', colorkey='black')
+
