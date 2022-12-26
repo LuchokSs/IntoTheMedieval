@@ -1,10 +1,11 @@
 import random
 
 from cellClass import Cell
-from globals import squad, UNITS, CELL_SIZE, EXIT_MENU_EVENT, MOVING_UNIT_EVENT
-from unitClass import Unit
+from globals import squad, UNITS, CELL_SIZE, EXIT_MENU_EVENT, MOVING_UNIT_EVENT, SPELLCAST_UNIT_EVENT, CELL_TYPES
+from globals import HOUSE_DAMAGED_EVENT
 import json_tricks as json
 from interfaceClass import Interface
+from secondary import load_image
 
 import pygame
 
@@ -18,6 +19,7 @@ def field_mode(main_screen, *args, **kwargs):
 
     running = True
     moving_phase = False
+    attacking_phase = False
 
     board = Field(main_screen, running)
 
@@ -53,10 +55,26 @@ def field_mode(main_screen, *args, **kwargs):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return 3
+            if event == HOUSE_DAMAGED_EVENT:
+                for pos in event.pos:
+                    cell = board.field[pos[0]][pos[1]]
+                    if not cell.destroyed:
+                        cell.sprite = load_image(f'''data\\cell_images\\HOUSE\\HOUSE_BURNING.png''', colorkey='black')
+                        cell.destroyed = True
+                        board.player_health -= 1
+                        if board.player_health == 0:
+                            return 2
             if event == MOVING_UNIT_EVENT:
                 board.mark_range(LAST_CLICKED.content.movement_range, LAST_CLICKED.crds)
                 moving_phase = True
-            if event.type == pygame.MOUSEBUTTONDOWN and moving_phase:
+            if event == SPELLCAST_UNIT_EVENT:
+                LAST_CLICKED.content.show_spellrange(board.field, LAST_CLICKED.crds)
+                attacking_phase = True
+            if event.type == pygame.MOUSEBUTTONDOWN and attacking_phase:
+                if board.use_spell(LAST_CLICKED, event.pos):
+                    attacking_phase = False
+                    board.clear_marks()
+            elif event.type == pygame.MOUSEBUTTONDOWN and moving_phase:
                 if board.move_unit(LAST_CLICKED, event.pos):
                     moving_phase = False
                     board.clear_marks()
@@ -107,8 +125,9 @@ class Field:
 
     def draw_field(self):
 
-        """Изображает поле на указанном хосте."""
+        """Изображает поле на хосте."""
 
+        self.interface.player_healthBar_status = self.player_health
         for row in self.field:
             for cell in row:
                 cell.draw_cell(self.surface)
@@ -142,8 +161,8 @@ class Field:
             if cell.content is not None:
                 self.interface.show_unit_interface(cell.content)
 
-        if LAST_CLICKED.content is not None:
-            self.interface.unit_management(pos)
+        if LAST_CLICKED is not None and LAST_CLICKED.content is not None:
+            self.interface.unit_management(pos, LAST_CLICKED)
 
         self.interface.interface_clicked(pos)
 
@@ -168,6 +187,16 @@ class Field:
             return False
         if cell.marked:
             self.move_content(unit, cell)
+            global LAST_CLICKED
+            LAST_CLICKED.clicked = False
+        return True
+
+    def use_spell(self, unit, pos):
+        cell = self.find_clicked_cell(pos)
+        if cell is None:
+            return False
+        if cell.marked:
+            unit.content.cast_spell(self.field, cell, unit)
             global LAST_CLICKED
             LAST_CLICKED.clicked = False
         return True

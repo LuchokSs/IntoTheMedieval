@@ -19,5 +19,7 @@ if __name__ == '__main__':
             mode = start_screen(main_screen)
         if mode == MODES['FIELD']:
             mode = field_mode(main_screen)
+        if mode == MODES['END_MENU']:
+            running = False
         if mode == MODES['EXIT']:
             running = False

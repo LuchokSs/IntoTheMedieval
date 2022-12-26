@@ -21,6 +21,8 @@ MOVEMENT_TYPES = {'grounded': 0,
 
 EXIT_MENU_EVENT = pygame.event.Event(pygame.USEREVENT + 1)
 MOVING_UNIT_EVENT = pygame.event.Event(pygame.USEREVENT + 2)
+SPELLCAST_UNIT_EVENT = pygame.event.Event(pygame.USEREVENT + 3)
+HOUSE_DAMAGED_EVENT = pygame.event.Event(pygame.USEREVENT + 4)
 
 
 UNITS = {'warrior': ".\\data\\units\\warrior\\unit.json",

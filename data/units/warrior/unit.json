@@ -1,1 +1,1 @@
-{"__instance_type__": ["unitClass", "Unit"], "attributes": {"name": "warrior", "health": 3, "movement_range": 3, "attack_range": 1, "image": ".\\data\\units\\warrior\\image.png"}}
+{"__instance_type__": ["unitClass", "Warrior"], "attributes": {"name": "warrior", "health": 3, "movement_range": 3, "attack_range": 1, "image": ".\\data\\units\\warrior\\image.png"}}
