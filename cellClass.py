@@ -22,6 +22,7 @@ class Cell:
     def __init__(self, points, pos, cell_type_id=None, indexes=(0, 0)):
         self.points = points
         self.crds = indexes
+        self.destroyed = False
 
         self.cell_type_id = cell_type_id
 
