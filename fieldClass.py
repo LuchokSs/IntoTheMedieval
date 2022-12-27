@@ -1,13 +1,16 @@
 import random
 
 from cellClass import Cell
-from globals import squad, UNITS, CELL_SIZE, EXIT_MENU_EVENT
+from globals import squad, UNITS, CELL_SIZE, EXIT_MENU_EVENT, MOVING_UNIT_EVENT, SPELLCAST_UNIT_EVENT, CELL_TYPES
+from globals import HOUSE_DAMAGED_EVENT
 import json_tricks as json
 from interfaceClass import Interface
+from secondary import load_image
 
 import pygame
 
 
+STAGE = 0
 LAST_CLICKED = None
 
 
@@ -15,6 +18,8 @@ def field_mode(main_screen, *args, **kwargs):
     """Функция с игровым цЫклом поля."""
 
     running = True
+    moving_phase = False
+    attacking_phase = False
 
     board = Field(main_screen, running)
 
@@ -40,9 +45,7 @@ def field_mode(main_screen, *args, **kwargs):
 
         board.draw_field()
 
-    for row in board.field:
-        for cell in row:
-            cell.marked = False
+    board.clear_marks()
 
     while running:
         pygame.display.flip()
@@ -52,7 +55,30 @@ def field_mode(main_screen, *args, **kwargs):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return 3
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event == HOUSE_DAMAGED_EVENT:
+                for pos in event.pos:
+                    cell = board.field[pos[0]][pos[1]]
+                    if not cell.destroyed:
+                        cell.sprite = load_image(f'''data\\cell_images\\HOUSE\\HOUSE_BURNING.png''', colorkey='black')
+                        cell.destroyed = True
+                        board.player_health -= 1
+                        if board.player_health == 0:
+                            return 2
+            if event == MOVING_UNIT_EVENT:
+                board.mark_range(LAST_CLICKED.content.movement_range, LAST_CLICKED.crds)
+                moving_phase = True
+            if event == SPELLCAST_UNIT_EVENT:
+                LAST_CLICKED.content.show_spellrange(board.field, LAST_CLICKED.crds)
+                attacking_phase = True
+            if event.type == pygame.MOUSEBUTTONDOWN and attacking_phase:
+                if board.use_spell(LAST_CLICKED, event.pos):
+                    attacking_phase = False
+                    board.clear_marks()
+            elif event.type == pygame.MOUSEBUTTONDOWN and moving_phase:
+                if board.move_unit(LAST_CLICKED, event.pos):
+                    moving_phase = False
+                    board.clear_marks()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
                 board.clicked(event.pos)
             if event == EXIT_MENU_EVENT:
                 return 0
@@ -65,6 +91,7 @@ class Field:
 
     patterns_name = ["HILLS_PATTERNS"]  # WIP , "LAKE_PATTERNS", "FOREST_PATTERNS", "CITY_PATTERNS"
     patterns_num = 3
+    player_health = 4
 
     def __init__(self, surface, running):
         pygame.font.init()
@@ -73,7 +100,7 @@ class Field:
         self.surface = surface
         self.running = running
 
-        self.interface = Interface(self.surface)
+        self.interface = Interface(self.surface, self.player_health)
         self.interface.update()
 
         self.field = \
@@ -90,7 +117,7 @@ class Field:
             for cell in range(len(self.field[row])):
                 points = ((2 * xs, ys), (xs, 2 * ys), (0, ys), (xs, 0))
                 pos = 100 + xs * (row + cell), 350 + ys * (row - cell)
-                self.field[row][cell] = Cell(points, pos, int(self.field[row][cell]))
+                self.field[row][cell] = Cell(points, pos, int(self.field[row][cell]), (row, cell))
 
         for i in marked_list:
             pos = i.split()
@@ -98,12 +125,15 @@ class Field:
 
     def draw_field(self):
 
-        """Изображает поле на указанном хосте."""
+        """Изображает поле на хосте."""
 
+        self.interface.player_healthBar_status = self.player_health
         for row in self.field:
             for cell in row:
                 cell.draw_cell(self.surface)
 
+        if LAST_CLICKED is None or LAST_CLICKED.content is None:
+            self.interface.hide_unit_interface()
         self.interface.update()
 
     def find_clicked_cell(self, pos):
@@ -128,6 +158,12 @@ class Field:
             cell.clicked = True
             LAST_CLICKED = cell
 
+            if cell.content is not None:
+                self.interface.show_unit_interface(cell.content)
+
+        if LAST_CLICKED is not None and LAST_CLICKED.content is not None:
+            self.interface.unit_management(pos, LAST_CLICKED)
+
         self.interface.interface_clicked(pos)
 
     def set_unit(self, pos, unit_name, marked=False):
@@ -144,3 +180,55 @@ class Field:
                 cell.content = json.load(file)
                 return True
         return False
+
+    def move_unit(self, unit, pos):
+        cell = self.find_clicked_cell(pos)
+        if cell is None:
+            return False
+        if cell.marked:
+            self.move_content(unit, cell)
+            global LAST_CLICKED
+            LAST_CLICKED.clicked = False
+        return True
+
+    def use_spell(self, unit, pos):
+        cell = self.find_clicked_cell(pos)
+        if cell is None:
+            return False
+        if cell.marked:
+            unit.content.cast_spell(self.field, cell, unit)
+            global LAST_CLICKED
+            LAST_CLICKED.clicked = False
+        return True
+
+    def clear_marks(self):
+        for row in self.field:
+            for cell in row:
+                cell.marked = False
+
+    def mark_range(self, range, curr_cell, movement_type=0):
+        if range == 0:
+            return
+        try:
+            if self.field[curr_cell[0]][curr_cell[1]].marked:
+                return
+        except IndexError:
+            return
+        if movement_type == 0:
+            if self.field[curr_cell[0]][curr_cell[1]].cell_type_id != 0:
+                return
+            else:
+                self.field[curr_cell[0]][curr_cell[1]].marked = True
+                self.mark_range(range - 1, [curr_cell[0] - 1, curr_cell[1]], movement_type)
+                self.mark_range(range - 1, [curr_cell[0], curr_cell[1] - 1], movement_type)
+                self.mark_range(range - 1, [curr_cell[0] + 1, curr_cell[1]], movement_type)
+                self.mark_range(range - 1, [curr_cell[0], curr_cell[1] + 1], movement_type)
+        if movement_type == 1:
+            self.field[curr_cell[0]][curr_cell[1]].marked = True
+            self.mark_range(range - 1, [curr_cell[0] - 1, curr_cell[1]], movement_type)
+            self.mark_range(range - 1, [curr_cell[0], curr_cell[1] - 1], movement_type)
+            self.mark_range(range - 1, [curr_cell[0] + 1, curr_cell[1]], movement_type)
+            self.mark_range(range - 1, [curr_cell[0], curr_cell[1] + 1], movement_type)
+
+    def move_content(self, cell1, cell2):
+        cell1.content, cell2.content = cell2.content, cell1.content
