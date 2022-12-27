@@ -41,3 +41,13 @@ class Warrior(Unit):
                 if field[x][y + dy].cell_type_id == 2:
                     event.pos.append([x, y + dy])
         pygame.event.post(event)
+
+    def cell_under_attack(self, pos, field, cell):
+        if pos.crds[0] == cell.crds[0]:
+            x, y = pos.crds
+            for dx in range(-1, 2, 1):
+                field[x + dx][y].clicked = True
+        elif pos.crds[1] == cell.crds[1]:
+            x, y = pos.crds
+            for dy in range(-1, 2, 1):
+                field[x][y + dy].clicked = True

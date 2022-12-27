@@ -70,6 +70,8 @@ def field_mode(main_screen, *args, **kwargs):
             if event == SPELLCAST_UNIT_EVENT:
                 LAST_CLICKED.content.show_spellrange(board.field, LAST_CLICKED.crds)
                 attacking_phase = True
+            if event.type == pygame.MOUSEMOTION and attacking_phase:
+                board.cell_under_attack(event.pos)
             if event.type == pygame.MOUSEBUTTONDOWN and attacking_phase:
                 if board.use_spell(LAST_CLICKED, event.pos):
                     attacking_phase = False
@@ -155,7 +157,9 @@ class Field:
             global LAST_CLICKED
             if LAST_CLICKED is not None:
                 LAST_CLICKED.clicked = False
+                LAST_CLICKED.tick = 0
             cell.clicked = True
+            cell.tick = 0
             LAST_CLICKED = cell
 
             if cell.content is not None:
@@ -189,6 +193,7 @@ class Field:
             self.move_content(unit, cell)
             global LAST_CLICKED
             LAST_CLICKED.clicked = False
+            LAST_CLICKED.tick = 0
         return True
 
     def use_spell(self, unit, pos):
@@ -199,18 +204,23 @@ class Field:
             unit.content.cast_spell(self.field, cell, unit)
             global LAST_CLICKED
             LAST_CLICKED.clicked = False
+            LAST_CLICKED.tick = 0
         return True
 
-    def clear_marks(self):
+    def clear_marks(self, clicked=True, marked=True, tick=True):
         for row in self.field:
             for cell in row:
-                cell.marked = False
+                cell.marked = False if marked else cell.marked
+                cell.clicked = False if clicked else cell.clicked
+                cell.tick = 0 if tick else cell.tick
 
     def mark_range(self, range, curr_cell, movement_type=0):
         if range == 0:
             return
         try:
             if self.field[curr_cell[0]][curr_cell[1]].marked:
+                return
+            if curr_cell[0] < 0 or curr_cell[1] < 0:
                 return
         except IndexError:
             return
@@ -232,3 +242,13 @@ class Field:
 
     def move_content(self, cell1, cell2):
         cell1.content, cell2.content = cell2.content, cell1.content
+
+    def cell_under_attack(self, pos):
+        pos = self.find_clicked_cell(pos)
+        if pos is None or not pos.marked:
+            return
+        if pos.clicked:
+            self.clear_marks(marked=False, tick=False)
+        else:
+            self.clear_marks(marked=False)
+        LAST_CLICKED.content.cell_under_attack(pos, self.field, LAST_CLICKED)
