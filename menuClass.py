@@ -1,4 +1,5 @@
 import pygame
+from secondary import load_image
 from globals import MODES
 
 
@@ -17,7 +18,12 @@ def start_screen(main_screen):
                     elem.image = game.render(elem)
                     if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                         if elem.name == "Play":
-                            return MODES['FIELD']
+                            menu = SecondPhase(main_screen)
+                            res = menu.show_win()
+                            if res == 1:
+                                return MODES['FIELD']
+                            else:
+                                return MODES["EXIT"]
                         elif elem.name == "Quit":
                             return MODES["EXIT"]
                 else:
@@ -52,3 +58,98 @@ class Menu:
 
     def render_selected(self, elem):
         return self.main_font.render(elem.name, 1, (250, 250, 30))
+
+
+class SecondPhase:
+    def __init__(self, screen):
+        self.screen = screen
+        self.main_font = pygame.font.Font(None, 36)
+        self.characters = pygame.sprite.Group()
+
+        sprite = pygame.sprite.Sprite()
+        sprite.image = pygame.transform.scale(load_image("data\\units\\IMG_0055.png"), (100, 150))
+        sprite.rect = sprite.image.get_rect()
+        sprite.rect.x, sprite.rect.y = 600, 100
+        sprite.name = "1"
+        self.characters.add(sprite)
+
+        sprite = pygame.sprite.Sprite()
+        sprite.image = pygame.transform.scale(load_image("data\\units\\IMG_0055.png"), (100, 150))
+        sprite.rect = sprite.image.get_rect()
+        sprite.rect.x, sprite.rect.y = 600, 280
+        sprite.name = "2"
+        self.characters.add(sprite)
+
+        sprite = pygame.sprite.Sprite()
+        sprite.image = pygame.transform.scale(load_image("data\\units\\IMG_0055.png"), (100, 150))
+        sprite.rect = sprite.image.get_rect()
+        sprite.rect.x, sprite.rect.y = 600, 460
+        sprite.name = "3"
+        self.characters.add(sprite)
+
+        self.btn = pygame.sprite.Group()
+
+        sprite = pygame.sprite.Sprite()
+        sprite.image = self.main_font.render("Start", 1, (0, 0, 0))
+        sprite.rect = sprite.image.get_rect()
+        sprite.rect.x, sprite.rect.y = 900, 650
+        self.btn.add(sprite)
+
+    def show_win(self):
+        while True:
+            self.screen.fill((0, 100, 200))
+            image1 = pygame.Surface([400, 170])
+            image1.fill("green")
+            self.screen.blit(image1, (590, 90))
+
+            image2 = pygame.Surface([400, 170])
+            image2.fill("green")
+            self.screen.blit(image2, (590, 270))
+
+            image3 = pygame.Surface([400, 170])
+            image3.fill("green")
+            self.screen.blit(image3, (590, 450))
+            pos = pygame.mouse.get_pos()
+
+            self.characters.draw(self.screen)
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    return -1
+                for elem in self.characters:
+                    if elem.rect.collidepoint(pos) and event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                        self.character_selection()
+                for elem in self.btn:
+                    if elem.rect.collidepoint(pos) and event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                        return 1
+            self.btn.draw(self.screen)
+            pygame.display.flip()
+
+    def character_selection(self):
+        s = pygame.Surface((1000, 700), pygame.SRCALPHA)
+        s.fill((0, 0, 0, 128))
+        image = pygame.Surface([400, 400])
+        image.fill(pygame.Color("white"))
+        s.blit(image, (300, 150))
+
+        group = pygame.sprite.Group()
+        btn_ok = pygame.sprite.Sprite()
+        btn_ok.image = self.main_font.render("OK", 1, (0, 0, 0))
+        btn_ok.rect = btn_ok.image.get_rect()
+        btn_ok.rect.x, btn_ok.rect.y = 650, 520
+        group.add(btn_ok)
+        group.draw(s)
+
+        self.screen.blit(s, (0, 0))
+
+        while True:
+            for event in pygame.event.get():
+                pos = pygame.mouse.get_pos()
+                if event.type == pygame.QUIT:
+                    return -1
+                for elem in group:
+                    if elem.rect.collidepoint(pos) and event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                        return
+
+            group.draw(s)
+            pygame.display.flip()
