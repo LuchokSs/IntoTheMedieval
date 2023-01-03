@@ -10,7 +10,6 @@ from secondary import load_image
 import pygame
 
 
-STAGE = 0
 LAST_CLICKED = None
 
 
@@ -20,6 +19,8 @@ def field_mode(main_screen, *args, **kwargs):
     running = True
     moving_phase = False
     attacking_phase = False
+
+    STAGE = 0  # 0 - ход бота. 1 - ход игрока.
 
     board = Field(main_screen, running)
 
@@ -50,40 +51,48 @@ def field_mode(main_screen, *args, **kwargs):
     while running:
         pygame.display.flip()
 
-        main_screen.fill((0, 0, 0))
+        if STAGE == 0:
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return 3
-            if event == HOUSE_DAMAGED_EVENT:
-                for pos in event.pos:
-                    cell = board.field[pos[0]][pos[1]]
-                    if not cell.destroyed:
-                        cell.sprite = load_image(f'''data\\cell_images\\HOUSE\\HOUSE_BURNING.png''', colorkey='black')
-                        cell.destroyed = True
-                        board.player_health -= 1
-                        if board.player_health == 0:
-                            return 2
-            if event == MOVING_UNIT_EVENT:
-                board.mark_range(LAST_CLICKED.content.movement_range, LAST_CLICKED.crds)
-                moving_phase = True
-            if event == SPELLCAST_UNIT_EVENT:
-                LAST_CLICKED.content.show_spellrange(board.field, LAST_CLICKED.crds)
-                attacking_phase = True
-            if event.type == pygame.MOUSEMOTION and attacking_phase:
-                board.cell_under_attack(event.pos)
-            if event.type == pygame.MOUSEBUTTONDOWN and attacking_phase:
-                if board.use_spell(LAST_CLICKED, event.pos):
-                    attacking_phase = False
-                    board.clear_marks()
-            elif event.type == pygame.MOUSEBUTTONDOWN and moving_phase:
-                if board.move_unit(LAST_CLICKED, event.pos):
-                    moving_phase = False
-                    board.clear_marks()
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                board.clicked(event.pos)
-            if event == EXIT_MENU_EVENT:
-                return 0
+            if len(board.enemy_list) == 0:
+                board.generate_enemy(3)
+
+            STAGE = 1
+
+        if STAGE == 1:
+            main_screen.fill((0, 0, 0))
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    return 3
+                if event == HOUSE_DAMAGED_EVENT:
+                    for pos in event.pos:
+                        cell = board.field[pos[0]][pos[1]]
+                        if not cell.destroyed:
+                            cell.sprite = load_image(f'''data\\cell_images\\HOUSE\\HOUSE_BURNING.png''', colorkey='black')
+                            cell.destroyed = True
+                            board.player_health -= 1
+                            if board.player_health == 0:
+                                return 2
+                if event == MOVING_UNIT_EVENT:
+                    board.mark_range(LAST_CLICKED.content.movement_range, LAST_CLICKED.crds)
+                    moving_phase = True
+                if event == SPELLCAST_UNIT_EVENT:
+                    LAST_CLICKED.content.show_spellrange(board.field, LAST_CLICKED.crds)
+                    attacking_phase = True
+                if event.type == pygame.MOUSEMOTION and attacking_phase:
+                    board.cell_under_attack(event.pos)
+                if event.type == pygame.MOUSEBUTTONDOWN and attacking_phase:
+                    if board.use_spell(LAST_CLICKED, event.pos):
+                        attacking_phase = False
+                        board.clear_marks()
+                elif event.type == pygame.MOUSEBUTTONDOWN and moving_phase:
+                    if board.move_unit(LAST_CLICKED, event.pos):
+                        moving_phase = False
+                        board.clear_marks()
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    board.clicked(event.pos)
+                if event == EXIT_MENU_EVENT:
+                    return 0
 
         board.draw_field()
 
@@ -94,6 +103,8 @@ class Field:
     patterns_name = ["HILLS_PATTERNS"]  # WIP , "LAKE_PATTERNS", "FOREST_PATTERNS", "CITY_PATTERNS"
     patterns_num = 3
     player_health = 4
+
+    enemy_list = []
 
     def __init__(self, surface, running):
         pygame.font.init()
@@ -110,6 +121,7 @@ class Field:
         random.randint(1, self.patterns_num)}.txt''',
                  'r').readlines()
         marked_list = self.field[10:]
+        self.starting_pos = marked_list
         self.field = list(map(str.split, self.field[:10]))
 
         xs = CELL_SIZE[0] // 2
@@ -184,6 +196,12 @@ class Field:
                 cell.content = json.load(file)
                 return True
         return False
+
+    def generate_enemy(self, num):
+        for i in range(num):
+            cell = random.choice(self.starting_pos)
+            cell = list(map(lambda x: 9 - (int(x)), cell.split()))
+            self.field[cell[0]][cell[1]].enemy_summon_mark = True
 
     def move_unit(self, unit, pos):
         cell = self.find_clicked_cell(pos)

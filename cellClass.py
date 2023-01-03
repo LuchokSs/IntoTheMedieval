@@ -16,6 +16,7 @@ class Cell:
     content = None
     clicked = False
     marked = False
+    enemy_summon_mark = False
     tick = 0
     animation_direction = True
 
@@ -40,12 +41,17 @@ class Cell:
         """Изображает клетку на поле. Черный цвет - цвет фона (Предварительно)."""
         image = self.sprite.copy()
 
-        if self.marked:
+        if self.enemy_summon_mark:  # Рисует метку появления врага на клетке. (предварительно)
+            pygame.draw.polygon(image, (150, 30, 30),
+                                ((0, CELL_SIZE[1] // 2), (CELL_SIZE[0] // 2, 0),
+                                 (CELL_SIZE[0], CELL_SIZE[1] // 2), (CELL_SIZE[0] // 2, CELL_SIZE[1])), 5)
+
+        if self.marked:  # Рисует квадрат-метку на поле.
             pygame.draw.polygon(image, (150, 150, 30),
                                 ((0, CELL_SIZE[1] // 2), (CELL_SIZE[0] // 2, 0),
                                  (CELL_SIZE[0], CELL_SIZE[1] // 2), (CELL_SIZE[0] // 2, CELL_SIZE[1])), 5)
 
-        if self.clicked:
+        if self.clicked:  # Ответственный за анимацию "переливания" блок.
             image = pil_image_to_surface(image, direction=False)
             data = image.load()
             for x in range(image.size[0]):
@@ -61,7 +67,7 @@ class Cell:
         else:
             image.set_colorkey('black')
 
-        if self.content is not None:
+        if self.content is not None:  # Добавление картинки юнита на картинку клетки.
             unit_image = self.content.get_image()
             image.blit(unit_image, unit_image.get_rect())
 
