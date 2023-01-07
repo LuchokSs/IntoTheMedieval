@@ -334,23 +334,6 @@ class Hiller(Unit):
 
 
 class Tower(Unit):
-    def click_range(self, field, range, curr_cell, movement_type=1):
-        if range == 0:
-            return
-        try:
-            if field[curr_cell[0]][curr_cell[1]].clicked:
-                return
-            if curr_cell[0] < 0 or curr_cell[1] < 0:
-                return
-        except IndexError:
-            return
-        if movement_type == 1:
-            field[curr_cell[0]][curr_cell[1]].clicked = True
-            self.click_range(field, range - 1, [curr_cell[0] - 1, curr_cell[1]], movement_type)
-            self.click_range(field, range - 1, [curr_cell[0], curr_cell[1] - 1], movement_type)
-            self.click_range(field, range - 1, [curr_cell[0] + 1, curr_cell[1]], movement_type)
-            self.click_range(field, range - 1, [curr_cell[0], curr_cell[1] + 1], movement_type)
-
     def mark_range(self, field, range, curr_cell, movement_type=1):
         if range == 0:
             return
@@ -378,7 +361,6 @@ class Tower(Unit):
             field[x][y].content.health -= 1
 
     def cell_under_attack(self, pos, field, cell):
-        x, y = cell.crds
-        self.click_range(field, 6, (x, y), 1)
-
-    # GG
+        x, y = pos.crds
+        if field[x][y].marked:
+            field[x][y].clicked = True
