@@ -17,6 +17,10 @@ class Unit:
         return load_image(self.image, colorkey='black')
 
 
+class EnemyWarrior(Unit):
+    pass
+
+
 class Warrior(Unit):
     def show_spellrange(self, field, pos):
         field[pos[0] + 1][pos[1]].marked = True
@@ -327,3 +331,52 @@ class Hiller(Unit):
                     field[x - num][y].clicked = True
                 else:
                     break
+
+
+class Tower(Unit):
+    def click_range(self, field, range, curr_cell, movement_type=1):
+        if range == 0:
+            return
+        try:
+            if field[curr_cell[0]][curr_cell[1]].clicked:
+                return
+            if curr_cell[0] < 0 or curr_cell[1] < 0:
+                return
+        except IndexError:
+            return
+        if movement_type == 1:
+            field[curr_cell[0]][curr_cell[1]].clicked = True
+            self.click_range(field, range - 1, [curr_cell[0] - 1, curr_cell[1]], movement_type)
+            self.click_range(field, range - 1, [curr_cell[0], curr_cell[1] - 1], movement_type)
+            self.click_range(field, range - 1, [curr_cell[0] + 1, curr_cell[1]], movement_type)
+            self.click_range(field, range - 1, [curr_cell[0], curr_cell[1] + 1], movement_type)
+
+    def mark_range(self, field, range, curr_cell, movement_type=1):
+        if range == 0:
+            return
+        try:
+            if field[curr_cell[0]][curr_cell[1]].marked:
+                return
+            if curr_cell[0] < 0 or curr_cell[1] < 0:
+                return
+        except IndexError:
+            return
+        if movement_type == 1:
+            field[curr_cell[0]][curr_cell[1]].marked = True
+            self.mark_range(field, range - 1, [curr_cell[0] - 1, curr_cell[1]], movement_type)
+            self.mark_range(field, range - 1, [curr_cell[0], curr_cell[1] - 1], movement_type)
+            self.mark_range(field, range - 1, [curr_cell[0] + 1, curr_cell[1]], movement_type)
+            self.mark_range(field, range - 1, [curr_cell[0], curr_cell[1] + 1], movement_type)
+
+    def show_spellrange(self, field, pos):
+        x, y = pos
+        self.mark_range(field, 6, (x, y), 1)
+
+    def cast_spell(self, field, pos, unit):
+        x, y = unit.crds
+        if field[x][y].marked:
+            field[x][y].content.health -= 1
+
+    def cell_under_attack(self, pos, field, cell):
+        x, y = cell.crds
+        self.click_range(field, 6, (x, y), 1)

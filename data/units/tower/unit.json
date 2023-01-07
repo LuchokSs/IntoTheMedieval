@@ -1,0 +1,1 @@
+{"__instance_type__": ["unitClass", "Tower"], "attributes": {"name": "tower", "health": 4, "movement_range": 0, "attack_range": 6, "image": ".\\data\\units\\tower\\image.png"}}
