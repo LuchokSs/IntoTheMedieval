@@ -32,4 +32,4 @@ UNITS = {'warrior': ".\\data\\units\\warrior\\unit.json",
          'hiller': '.\\data\\units\\hiller\\unit.json',
          'tower': '.\\data\\units\\tower\\unit.json'}
 
-squad = ['warrior', 'hiller', 'shield']
+squad = ['warrior', 'tower', 'shield']
