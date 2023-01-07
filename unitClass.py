@@ -334,26 +334,20 @@ class Hiller(Unit):
 
 
 class Tower(Unit):
-    def mark_range(self, field, range, curr_cell, movement_type=1):
+    def mark_range(self, field, range, curr_cell):
         if range == 0:
             return
-        try:
-            if field[curr_cell[0]][curr_cell[1]].marked:
-                return
-            if curr_cell[0] < 0 or curr_cell[1] < 0:
-                return
-        except IndexError:
+        if curr_cell[0] < 0 or curr_cell[1] < 0 or curr_cell[0] > 9 or curr_cell[1] > 9:
             return
-        if movement_type == 1:
-            field[curr_cell[0]][curr_cell[1]].marked = True
-            self.mark_range(field, range - 1, [curr_cell[0] - 1, curr_cell[1]], movement_type)
-            self.mark_range(field, range - 1, [curr_cell[0], curr_cell[1] - 1], movement_type)
-            self.mark_range(field, range - 1, [curr_cell[0] + 1, curr_cell[1]], movement_type)
-            self.mark_range(field, range - 1, [curr_cell[0], curr_cell[1] + 1], movement_type)
+        field[curr_cell[0]][curr_cell[1]].marked = True
+        self.mark_range(field, range - 1, [curr_cell[0] - 1, curr_cell[1]])
+        self.mark_range(field, range - 1, [curr_cell[0], curr_cell[1] - 1])
+        self.mark_range(field, range - 1, [curr_cell[0] + 1, curr_cell[1]])
+        self.mark_range(field, range - 1, [curr_cell[0], curr_cell[1] + 1])
 
     def show_spellrange(self, field, pos):
         x, y = pos
-        self.mark_range(field, 6, (x, y), 1)
+        self.mark_range(field, 6, (x, y))
 
     def cast_spell(self, field, pos, unit):
         x, y = unit.crds
