@@ -6,6 +6,7 @@ from globals import HOUSE_DAMAGED_EVENT
 import json_tricks as json
 from interfaceClass import Interface
 from secondary import load_image
+from unitClass import EnemyWarrior
 
 import pygame
 
@@ -52,7 +53,7 @@ def field_mode(main_screen, *args, **kwargs):
         pygame.display.flip()
 
         if STAGE == 0:
-
+            board.summon_enemies()
             if len(board.enemy_list) == 0:
                 board.generate_enemy(3)
 
@@ -198,10 +199,22 @@ class Field:
         return False
 
     def generate_enemy(self, num):
-        for i in range(num):
-            cell = random.choice(self.starting_pos)
-            cell = list(map(lambda x: 9 - (int(x)), cell.split()))
-            self.field[cell[0]][cell[1]].enemy_summon_mark = True
+        cnt = 0
+        while cnt < num:
+            cell = random.randint(6, 8), random.randint(1, 8)
+            self.field[cell[0]][cell[1]].enemy_summon_mark = (True
+                                                              if self.field[cell[0]][cell[1]].cell_type_id == 0
+                                                              and not self.field[cell[0]][cell[1]].enemy_summon_mark
+                                                              else False)
+            cnt += 1 if self.field[cell[0]][cell[1]].enemy_summon_mark else 0
+
+    def summon_enemies(self):
+        for row in self.field:
+            for cell in row:
+                if cell.enemy_summon_mark:
+                    cell.enemy_summon_mark = False
+                    cell.content = EnemyWarrior()
+                    self.enemy_list.append(cell.content)
 
     def move_unit(self, unit, pos):
         cell = self.find_clicked_cell(pos)
@@ -225,12 +238,13 @@ class Field:
             LAST_CLICKED.tick = 0
         return True
 
-    def clear_marks(self, clicked=True, marked=True, tick=True):
+    def clear_marks(self, clicked=True, marked=True, tick=True, enemy_summon_mark=False):
         for row in self.field:
             for cell in row:
                 cell.marked = False if marked else cell.marked
                 cell.clicked = False if clicked else cell.clicked
                 cell.tick = 0 if tick else cell.tick
+                cell.enemy_summon_mark = False if enemy_summon_mark else cell.enemy_summon_mark
 
     def mark_range(self, range, curr_cell, movement_type=0):
         if range == 0:

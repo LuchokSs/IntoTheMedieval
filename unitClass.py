@@ -51,3 +51,7 @@ class Warrior(Unit):
             x, y = pos.crds
             for dy in range(-1, 2, 1):
                 field[x][y + dy].clicked = True
+
+
+class EnemyWarrior(Unit):
+    pass
