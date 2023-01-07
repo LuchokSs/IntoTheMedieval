@@ -42,3 +42,10 @@ def pil_image_to_surface(image, direction=True):
 def new_unit(unit):
     with open(UNITS[unit.name], "w") as write_file:
         json.dump(unit, write_file)
+
+
+def good_cell(cell):
+    if cell.cell_type_id == 3 or cell.cell_type_id == 4 or cell.cell_type_id == 2:
+        return False
+    else:
+        return True
