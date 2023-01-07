@@ -89,49 +89,53 @@ class Archer(Unit):
         event = HOUSE_DAMAGED_EVENT
         event.pos = []
         if pos.crds[1] == unit.crds[1]:
-            x, y = pos.crds
-            num = 0
+            x, y = unit.crds
+            num = 1
             while x + num < 10:
                 if field[x + num][y].content is not None:
                     field[x + num][y].content.health -= 2
-                    if good_cell(field[x + num + 1][y]) and x + num + 1 < 10:
-                        Field.move_content(1, field[x + num][y], field[x + num + 1][y])
-                    break
+                    if x + num + 1 < 10:
+                        if good_cell(field[x + num + 1][y]):
+                            Field.move_content(1, field[x + num][y], field[x + num + 1][y])
+                        break
                 if field[x + num][y].cell_type_id == 2:
                     event.pos.append([x + num, y])
                     break
                 num += 1
-            num = 0
+            num = 1
             while x - num > 0:
                 if field[x - num][y].content is not None:
                     field[x - num][y].content.health -= 2
-                    if good_cell(field[x - num - 1][y]) and x - num - 1 > -10:
-                        Field.move_content(1, field[x - num][y], field[x - num - 1][y])
-                    break
+                    if x - num - 1 > -10:
+                        if good_cell(field[x - num - 1][y]):
+                            Field.move_content(1, field[x - num][y], field[x - num - 1][y])
+                        break
                 if field[x - num][y].cell_type_id == 2:
                     event.pos.append([x - num, y])
                     break
                 num += 1
         elif pos.crds[0] == unit.crds[0]:
-            x, y = pos.crds
-            num = 0
+            x, y = unit.crds
+            num = 1
             while y + num < 10:
                 if field[x][y + num].content is not None:
                     field[x][y + num].content.health -= 2
-                    if good_cell(field[x][y + num + 1]) and y + num + 1 < 10:
-                        Field.move_content(1, field[x][y + num], field[x][y + num + 1])
-                    break
+                    if y + num + 1 < 10:
+                        if good_cell(field[x][y + num + 1]):
+                            Field.move_content(1, field[x][y + num], field[x][y + num + 1])
+                        break
                 if field[x][y + num].cell_type_id == 2:
                     event.pos.append([x, y + num])
                     break
                 num += 1
-            num = 0
+            num = 1
             while y - num > 0:
                 if field[x][y - num].content is not None:
                     field[x][y - num].content.health -= 2
-                    if good_cell(field[x][y - num - 1]) and y - num - 1 > -10:
-                        Field.move_content(1, field[x][y - num], field[x][y - num - 1])
-                    break
+                    if y - num - 1 > -10:
+                        if good_cell(field[x][y - num - 1]):
+                            Field.move_content(1, field[x][y - num], field[x][y - num - 1])
+                        break
                 if field[x][y - num].cell_type_id == 2:
                     event.pos.append([x, y - num])
                     break
@@ -172,6 +176,78 @@ class Archer(Unit):
             num = 0
             while x - num > 0:
                 num += 1
+                field[x - num][y].clicked = True
+                if good_cell(field[x - num][y]):
+                    field[x - num][y].clicked = True
+                else:
+                    break
+
+
+class Shield(Unit):
+    def show_spellrange(self, field, pos):
+        if good_cell(field[pos[0] + 1][pos[1]]):
+            field[pos[0] + 1][pos[1]].marked = True
+        if good_cell(field[pos[0]][pos[1] + 1]):
+            field[pos[0]][pos[1] + 1].marked = True
+        if good_cell(field[pos[0] - 1][pos[1]]):
+            field[pos[0] - 1][pos[1]].marked = True
+        if good_cell(field[pos[0]][pos[1] - 1]):
+            field[pos[0]][pos[1] - 1].marked = True
+
+    def cast_spell(self, field, pos, unit):
+        if pos.crds[1] == unit.crds[1]:
+            x, y = unit.crds
+            num = 1
+            if field[x + num][y].content is not None and x + num + 1 < 10:
+                if good_cell(field[x + num + 1][y]):
+                    Field.move_content(1, field[x + num][y], field[x + num + 1][y])
+                else:
+                    field[x + num][y].content.health -= 1
+            elif field[x - num][y].content is not None and x - num - 1 > 0:
+                if good_cell(field[x - num - 1][y]):
+                    Field.move_content(1, field[x - num][y], field[x - num - 1][y])
+                else:
+                    field[x - num][y].content.health -= 1
+        elif pos.crds[0] == unit.crds[0]:
+            x, y = unit.crds
+            num = 1
+            if field[x][y + num].content is not None and y + num + 1 < 10:
+                if good_cell(field[x][y + num + 1]):
+                    Field.move_content(1, field[x][y + num], field[x][y + num + 1])
+                else:
+                    field[x][y + num].content.health -= 1
+            elif field[x][y - num].content is not None and y - num - 1 > 0:
+                if good_cell(field[x][y - num - 1]):
+                    Field.move_content(1, field[x][y - num], field[x][y - num - 1])
+                else:
+                    field[x][y - num].content.health -= 1
+
+    def cell_under_attack(self, pos, field, cell):
+        if pos.crds[0] == cell.crds[0] and pos.crds[1] > cell.crds[1]:
+            x, y = cell.crds
+            for num in range(2):
+                if good_cell(field[x][y + num]):
+                    field[x][y + num].clicked = True
+                else:
+                    break
+        elif pos.crds[0] == cell.crds[0] and pos.crds[1] < cell.crds[1]:
+            x, y = cell.crds
+            for num in range(2):
+                field[x][y - num].clicked = True
+                if good_cell(field[x][y - num]):
+                    field[x][y - num].clicked = True
+                else:
+                    break
+        elif pos.crds[1] == cell.crds[1] and pos.crds[0] > cell.crds[0]:
+            x, y = cell.crds
+            for num in range(2):
+                if good_cell(field[x + num][y]):
+                    field[x + num][y].clicked = True
+                else:
+                    break
+        elif pos.crds[1] == cell.crds[1] and pos.crds[0] < cell.crds[0]:
+            x, y = cell.crds
+            for num in range(2):
                 field[x - num][y].clicked = True
                 if good_cell(field[x - num][y]):
                     field[x - num][y].clicked = True
