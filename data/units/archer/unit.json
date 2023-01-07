@@ -1,0 +1,1 @@
+{"__instance_type__": ["unitClass", "Archer"], "attributes": {"name": "archer", "health": 2, "movement_range": 3, "attack_range": 3, "image": ".\\data\\units\\archer\\image.png"}}
