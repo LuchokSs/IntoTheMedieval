@@ -64,7 +64,7 @@ class Archer(Unit):
                 break
             num += 1
         num = 0
-        while pos[0] - num > 0:
+        while pos[0] - num >= 0:
             if good_cell(field[pos[0] - num][pos[1]]):
                 field[pos[0] - num][pos[1]].marked = True
             else:
@@ -78,7 +78,7 @@ class Archer(Unit):
                 break
             num += 1
         num = 0
-        while pos[1] - num > 0:
+        while pos[1] - num >= 0:
             if good_cell(field[pos[0]][pos[1] - num]):
                 field[pos[0]][pos[1] - num].marked = True
             else:
@@ -91,55 +91,67 @@ class Archer(Unit):
         if pos.crds[1] == unit.crds[1]:
             x, y = unit.crds
             num = 1
-            while x + num < 10:
-                if field[x + num][y].content is not None:
-                    field[x + num][y].content.health -= 2
-                    if x + num + 1 < 10:
-                        if good_cell(field[x + num + 1][y]):
-                            Field.move_content(1, field[x + num][y], field[x + num + 1][y])
+            if pos.crds[0] > unit.crds[0]:
+                while x + num < 10:
+                    if field[x + num][y].content is not None:
+                        field[x + num][y].content.health -= 2
+                        if x + num + 1 < 10:
+                            if good_cell(field[x + num + 1][y]):
+                                Field.move_content(1, field[x + num][y], field[x + num + 1][y])
+                            break
+                    if field[x + num][y].cell_type_id == 2:
+                        event.pos.append([x + num, y])
                         break
-                if field[x + num][y].cell_type_id == 2:
-                    event.pos.append([x + num, y])
-                    break
-                num += 1
+                    if not field[x + num][y].marked:
+                        break
+                    num += 1
             num = 1
-            while x - num > 0:
-                if field[x - num][y].content is not None:
-                    field[x - num][y].content.health -= 2
-                    if x - num - 1 > -10:
-                        if good_cell(field[x - num - 1][y]):
-                            Field.move_content(1, field[x - num][y], field[x - num - 1][y])
+            if pos.crds[0] < unit.crds[0]:
+                while x - num >= 0:
+                    if field[x - num][y].content is not None:
+                        field[x - num][y].content.health -= 2
+                        if x - num - 1 > -10:
+                            if good_cell(field[x - num - 1][y]):
+                                Field.move_content(1, field[x - num][y], field[x - num - 1][y])
+                            break
+                    if field[x - num][y].cell_type_id == 2:
+                        event.pos.append([x - num, y])
                         break
-                if field[x - num][y].cell_type_id == 2:
-                    event.pos.append([x - num, y])
-                    break
-                num += 1
+                    if not field[x + num][y].marked:
+                        break
+                    num += 1
         elif pos.crds[0] == unit.crds[0]:
             x, y = unit.crds
             num = 1
-            while y + num < 10:
-                if field[x][y + num].content is not None:
-                    field[x][y + num].content.health -= 2
-                    if y + num + 1 < 10:
-                        if good_cell(field[x][y + num + 1]):
-                            Field.move_content(1, field[x][y + num], field[x][y + num + 1])
+            if pos.crds[1] > unit.crds[1]:
+                while y + num < 10:
+                    if field[x][y + num].content is not None:
+                        field[x][y + num].content.health -= 2
+                        if y + num + 1 < 10:
+                            if good_cell(field[x][y + num + 1]):
+                                Field.move_content(1, field[x][y + num], field[x][y + num + 1])
+                            break
+                    if field[x][y + num].cell_type_id == 2:
+                        event.pos.append([x, y + num])
                         break
-                if field[x][y + num].cell_type_id == 2:
-                    event.pos.append([x, y + num])
-                    break
-                num += 1
+                    if not field[x + num][y].marked:
+                        break
+                    num += 1
             num = 1
-            while y - num > 0:
-                if field[x][y - num].content is not None:
-                    field[x][y - num].content.health -= 2
-                    if y - num - 1 > -10:
-                        if good_cell(field[x][y - num - 1]):
-                            Field.move_content(1, field[x][y - num], field[x][y - num - 1])
+            if pos.crds[1] < unit.crds[1]:
+                while y - num >= 0:
+                    if field[x][y - num].content is not None:
+                        field[x][y - num].content.health -= 2
+                        if y - num - 1 > -10:
+                            if good_cell(field[x][y - num - 1]):
+                                Field.move_content(1, field[x][y - num], field[x][y - num - 1])
+                            break
+                    if field[x][y - num].cell_type_id == 2:
+                        event.pos.append([x, y - num])
                         break
-                if field[x][y - num].cell_type_id == 2:
-                    event.pos.append([x, y - num])
-                    break
-                num += 1
+                    if not field[x + num][y].marked:
+                        break
+                    num += 1
         pygame.event.post(event)
 
     def cell_under_attack(self, pos, field, cell):

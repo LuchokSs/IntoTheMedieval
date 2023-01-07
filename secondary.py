@@ -45,7 +45,7 @@ def new_unit(unit):
 
 
 def good_cell(cell):
-    if cell.cell_type_id == 3 or cell.cell_type_id == 4 or cell.cell_type_id == 2:
+    if cell.cell_type_id == 3 or cell.cell_type_id == 2:
         return False
     else:
         return True

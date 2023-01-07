@@ -74,7 +74,7 @@ def field_mode(main_screen, *args, **kwargs):
                             if board.player_health == 0:
                                 return 2
                 if event == MOVING_UNIT_EVENT:
-                    board.mark_range(LAST_CLICKED.content.movement_range, LAST_CLICKED.crds)
+                    board.mark_range(LAST_CLICKED.content.movement_range, LAST_CLICKED.crds, first=True)
                     moving_phase = True
                 if event == SPELLCAST_UNIT_EVENT:
                     LAST_CLICKED.content.show_spellrange(board.field, LAST_CLICKED.crds)
@@ -232,7 +232,7 @@ class Field:
                 cell.clicked = False if clicked else cell.clicked
                 cell.tick = 0 if tick else cell.tick
 
-    def mark_range(self, range, curr_cell, movement_type=0):
+    def mark_range(self, range, curr_cell, movement_type=0, first=False):
         if range == 0:
             return
         try:
@@ -242,6 +242,8 @@ class Field:
                 return
         except IndexError:
             return
+        if first:
+            self.field[curr_cell[0]][curr_cell[1]].marked = True
         if movement_type == 0:
             if self.field[curr_cell[0]][curr_cell[1]].cell_type_id != 0:
                 return
