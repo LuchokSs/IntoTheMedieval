@@ -253,3 +253,77 @@ class Shield(Unit):
                     field[x - num][y].clicked = True
                 else:
                     break
+
+
+class Hiller(Unit):
+    def show_spellrange(self, field, pos):
+        for num in range(3):
+            if good_cell(field[pos[0] + num][pos[1]]):
+                field[pos[0] + num][pos[1]].marked = True
+            else:
+                break
+        for num in range(3):
+            if good_cell(field[pos[0]][pos[1] + num]):
+                field[pos[0]][pos[1] + num].marked = True
+            else:
+                break
+        for num in range(3):
+            if good_cell(field[pos[0] - num][pos[1]]):
+                field[pos[0] - num][pos[1]].marked = True
+            else:
+                break
+        for num in range(3):
+            if good_cell(field[pos[0]][pos[1] - num]):
+                field[pos[0]][pos[1] - num].marked = True
+            else:
+                break
+
+    def cast_spell(self, field, pos, unit):
+        if pos.crds[0] == unit.crds[0]:
+            x, y = unit.crds
+            for num in range(3):
+                if field[x + num][y].content is not None:
+                    field[x + num][y].content.health += 2
+            for num in range(3):
+                if field[x - num][y].content is not None:
+                    field[x - num][y].content.health += 2
+        elif pos.crds[1] == unit.crds[1]:
+            x, y = unit.crds
+            for num in range(3):
+                if field[x][y + num].content is not None:
+                    field[x][y + num].content.health += 2
+            for num in range(3):
+                if field[x][y - num].content is not None:
+                    field[x][y - num].content.health += 2
+
+    def cell_under_attack(self, pos, field, cell):
+        if pos.crds[0] == cell.crds[0] and pos.crds[1] > cell.crds[1]:
+            x, y = cell.crds
+            for num in range(3):
+                if good_cell(field[x][y + num]):
+                    field[x][y + num].clicked = True
+                else:
+                    break
+        elif pos.crds[0] == cell.crds[0] and pos.crds[1] < cell.crds[1]:
+            x, y = cell.crds
+            for num in range(3):
+                field[x][y - num].clicked = True
+                if good_cell(field[x][y - num]):
+                    field[x][y - num].clicked = True
+                else:
+                    break
+        elif pos.crds[1] == cell.crds[1] and pos.crds[0] > cell.crds[0]:
+            x, y = cell.crds
+            for num in range(3):
+                if good_cell(field[x + num][y]):
+                    field[x + num][y].clicked = True
+                else:
+                    break
+        elif pos.crds[1] == cell.crds[1] and pos.crds[0] < cell.crds[0]:
+            x, y = cell.crds
+            for num in range(3):
+                field[x - num][y].clicked = True
+                if good_cell(field[x - num][y]):
+                    field[x - num][y].clicked = True
+                else:
+                    break
