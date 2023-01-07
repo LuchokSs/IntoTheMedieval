@@ -27,7 +27,8 @@ HOUSE_DAMAGED_EVENT = pygame.event.Event(pygame.USEREVENT + 4)
 
 
 UNITS = {'warrior': ".\\data\\units\\warrior\\unit.json",
-         'shield': 'way2',
-         'archer': 'way3'}
+         'shield': '.\\data\\units\\shield\\unit.json',
+         'archer': '.\\data\\units\\archer\\unit.json',
+         'hiller': '.\\data\\units\\hiller\\unit.json'}
 
-squad = ['warrior', 'warrior', 'warrior']
+squad = ['warrior', 'hiller', 'shield']
