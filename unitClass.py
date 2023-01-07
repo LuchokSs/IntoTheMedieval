@@ -380,3 +380,5 @@ class Tower(Unit):
     def cell_under_attack(self, pos, field, cell):
         x, y = cell.crds
         self.click_range(field, 6, (x, y), 1)
+
+    # GG
