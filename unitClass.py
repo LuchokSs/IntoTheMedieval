@@ -207,7 +207,7 @@ class Shield(Unit):
                     Field.move_content(1, field[x + num][y], field[x + num + 1][y])
                 else:
                     field[x + num][y].content.health -= 1
-            elif field[x - num][y].content is not None and x - num - 1 > 0:
+            elif field[x - num][y].content is not None and x - num - 1 >= 0:
                 if good_cell(field[x - num - 1][y]):
                     Field.move_content(1, field[x - num][y], field[x - num - 1][y])
                 else:
@@ -220,7 +220,7 @@ class Shield(Unit):
                     Field.move_content(1, field[x][y + num], field[x][y + num + 1])
                 else:
                     field[x][y + num].content.health -= 1
-            elif field[x][y - num].content is not None and y - num - 1 > 0:
+            elif field[x][y - num].content is not None and y - num - 1 >= 0:
                 if good_cell(field[x][y - num - 1]):
                     Field.move_content(1, field[x][y - num], field[x][y - num - 1])
                 else:
