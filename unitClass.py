@@ -364,3 +364,24 @@ class Tower(Unit):
         x, y = pos.crds
         if field[x][y].marked:
             field[x][y].clicked = True
+
+
+class Wizard(Unit):
+    def show_spellrange(self, field, pos):
+        for i in range(10):
+            for j in range(10):
+                if field[i][j].content:
+                    field[i][j].marked = True
+
+    def cast_spell(self, field, pos, unit):
+        x, y = pos.crds
+        i, j = unit.crds
+        if field[x][y].marked:
+            Field.move_content(1, field[x][y], field[i][j])
+
+    def cell_under_attack(self, pos, field, cell):
+        x, y = pos.crds
+        i, j = cell.crds
+        if field[x][y].marked:
+            field[x][y].clicked = True
+        field[i][j].clicked = True
