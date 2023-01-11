@@ -6,6 +6,7 @@ from globals import HOUSE_DAMAGED_EVENT
 import json_tricks as json
 from interfaceClass import Interface
 from secondary import load_image
+from unitClass import EnemyWarrior
 
 import pygame
 
@@ -52,9 +53,11 @@ def field_mode(main_screen, *args, **kwargs):
         pygame.display.flip()
 
         if STAGE == 0:
+            board.attack_enemies()
             board.summon_enemies()
             if len(board.enemy_list) == 0:
                 board.generate_enemy(3)
+            board.prepare_enemies()
 
             STAGE = 1
 
@@ -74,9 +77,13 @@ def field_mode(main_screen, *args, **kwargs):
                             if board.player_health == 0:
                                 return 2
                 if event == MOVING_UNIT_EVENT:
+                    if not LAST_CLICKED.content.turns_left['move']:
+                        pass
                     board.mark_range(LAST_CLICKED.content.movement_range, LAST_CLICKED.crds, first=True)
                     moving_phase = True
                 if event == SPELLCAST_UNIT_EVENT:
+                    if not LAST_CLICKED.content.turns_left['attack']:
+                        pass
                     LAST_CLICKED.content.show_spellrange(board.field, LAST_CLICKED.crds)
                     attacking_phase = True
                 if event.type == pygame.MOUSEMOTION and attacking_phase:
@@ -84,10 +91,12 @@ def field_mode(main_screen, *args, **kwargs):
                 if event.type == pygame.MOUSEBUTTONDOWN and attacking_phase:
                     if board.use_spell(LAST_CLICKED, event.pos):
                         attacking_phase = False
+                        LAST_CLICKED.content.turns_left['attack'] = False
                         board.clear_marks()
                 elif event.type == pygame.MOUSEBUTTONDOWN and moving_phase:
                     if board.move_unit(LAST_CLICKED, event.pos):
                         moving_phase = False
+                        LAST_CLICKED.content.turns_left['move'] = False
                         board.clear_marks()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     board.clicked(event.pos)
@@ -214,6 +223,16 @@ class Field:
                     cell.enemy_summon_mark = False
                     cell.content = EnemyWarrior()
                     self.enemy_list.append(cell.content)
+
+    def prepare_enemies(self):
+        for unit in self.enemy_list:
+            unit.move()
+
+    def attack_enemies(self):
+        for row in self.field:
+            for cell in row:
+                if cell.content is EnemyWarrior:
+                    cell.content.attack(self.field, cell)
 
     def move_unit(self, unit, pos):
         cell = self.find_clicked_cell(pos)
