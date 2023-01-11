@@ -81,22 +81,22 @@ def field_mode(main_screen, *args, **kwargs):
                         pass
                     board.mark_range(LAST_CLICKED.content.movement_range, LAST_CLICKED.crds, first=True)
                     moving_phase = True
+                    LAST_CLICKED.content.turns_left['move'] = False
                 if event == SPELLCAST_UNIT_EVENT:
-                    if not LAST_CLICKED.content.turns_left['attack']:
+                    if not LAST_CLICKED.content.turns_left['spell']:
                         pass
                     LAST_CLICKED.content.show_spellrange(board.field, LAST_CLICKED.crds)
                     attacking_phase = True
+                    LAST_CLICKED.content.turns_left['spell'] = False
                 if event.type == pygame.MOUSEMOTION and attacking_phase:
                     board.cell_under_attack(event.pos)
                 if event.type == pygame.MOUSEBUTTONDOWN and attacking_phase:
                     if board.use_spell(LAST_CLICKED, event.pos):
                         attacking_phase = False
-                        LAST_CLICKED.content.turns_left['attack'] = False
                         board.clear_marks()
                 elif event.type == pygame.MOUSEBUTTONDOWN and moving_phase:
                     if board.move_unit(LAST_CLICKED, event.pos):
                         moving_phase = False
-                        LAST_CLICKED.content.turns_left['move'] = False
                         board.clear_marks()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     board.clicked(event.pos)
