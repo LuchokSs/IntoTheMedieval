@@ -1,7 +1,7 @@
 import pygame
 
 from fieldClass import field_mode
-from globals import FPS, FIELD_SIZE, MODES
+from globals import FPS, FIELD_SIZE, MODES, available_units
 from menuClass import start_screen
 from endgameClass import end_screen
 from chestClass import chest_screen
@@ -16,7 +16,6 @@ if __name__ == '__main__':
 
     mode = MODES['START_MENU']
     # В зависимости от Mod'а игры запускается определенная функция.
-
     while running:
         if mode == MODES['START_MENU']:
             mode = start_screen(main_screen)

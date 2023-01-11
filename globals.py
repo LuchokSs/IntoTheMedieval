@@ -34,3 +34,7 @@ UNITS = {'warrior': ".\\data\\units\\warrior\\unit.json",
          'wizard': '.\\data\\units\\wizard\\unit.json'}
 
 squad = ['warrior', 'wizard', 'shield']
+
+# файл с имеющимися у игрока юнитами
+with open('data\\units\\available_units.txt', "r+") as units_file:
+    available_units = units_file.read().split()
