@@ -1,6 +1,6 @@
 import pygame
 from secondary import load_image
-from globals import MODES
+from globals import MODES, IMAGE_UNITS, squad
 
 
 def start_screen(main_screen):
@@ -64,38 +64,39 @@ class SecondPhase:
     def __init__(self, screen):
         self.screen = screen
         self.main_font = pygame.font.Font(None, 36)
-        self.characters = pygame.sprite.Group()
+
+    def show_win(self):
+        characters = pygame.sprite.Group()
 
         sprite = pygame.sprite.Sprite()
-        sprite.image = pygame.transform.scale(load_image("data\\units\\IMG_0055.png"), (100, 150))
+        sprite.image = pygame.transform.scale(load_image(IMAGE_UNITS[squad[0]]), (100, 150))
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x, sprite.rect.y = 600, 100
         sprite.name = "1"
-        self.characters.add(sprite)
+        characters.add(sprite)
 
         sprite = pygame.sprite.Sprite()
-        sprite.image = pygame.transform.scale(load_image("data\\units\\IMG_0055.png"), (100, 150))
+        sprite.image = pygame.transform.scale(load_image(IMAGE_UNITS[squad[1]]), (100, 150))
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x, sprite.rect.y = 600, 280
         sprite.name = "2"
-        self.characters.add(sprite)
+        characters.add(sprite)
 
         sprite = pygame.sprite.Sprite()
-        sprite.image = pygame.transform.scale(load_image("data\\units\\IMG_0055.png"), (100, 150))
+        sprite.image = pygame.transform.scale(load_image(IMAGE_UNITS[squad[2]]), (100, 150))
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x, sprite.rect.y = 600, 460
         sprite.name = "3"
-        self.characters.add(sprite)
+        characters.add(sprite)
 
-        self.btn = pygame.sprite.Group()
+        btn = pygame.sprite.Group()
 
         sprite = pygame.sprite.Sprite()
         sprite.image = self.main_font.render("Start", 1, (0, 0, 0))
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x, sprite.rect.y = 900, 650
-        self.btn.add(sprite)
+        btn.add(sprite)
 
-    def show_win(self):
         while True:
             self.screen.fill((0, 100, 200))
             image1 = pygame.Surface([400, 170])
@@ -111,45 +112,98 @@ class SecondPhase:
             self.screen.blit(image3, (590, 450))
             pos = pygame.mouse.get_pos()
 
-            self.characters.draw(self.screen)
+            characters.draw(self.screen)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     return -1
-                for elem in self.characters:
+                for elem in characters:
                     if elem.rect.collidepoint(pos) and event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                        self.character_selection()
-                for elem in self.btn:
+                        self.character_selection(elem)
+                        elem.image = pygame.transform.scale(load_image(IMAGE_UNITS[squad[int(elem.name) - 1]]),
+                                                            (100, 150))
+                for elem in btn:
                     if elem.rect.collidepoint(pos) and event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                         return 1
-            self.btn.draw(self.screen)
+            btn.draw(self.screen)
+            characters.draw(self.screen)
             pygame.display.flip()
 
-    def character_selection(self):
-        s = pygame.Surface((1000, 700), pygame.SRCALPHA)
-        s.fill((0, 0, 0, 128))
-        image = pygame.Surface([400, 400])
-        image.fill(pygame.Color("white"))
-        s.blit(image, (300, 150))
+    def character_selection(self, spr):
+        global squad
+        s = pygame.Surface((1000, 700))
+        s.fill((0, 0, 0))
+        s.set_alpha(100)
+        pygame.draw.rect(s, (255, 255, 255), (300, 150, 400, 400), 0)
 
         group = pygame.sprite.Group()
         btn_ok = pygame.sprite.Sprite()
         btn_ok.image = self.main_font.render("OK", 1, (0, 0, 0))
         btn_ok.rect = btn_ok.image.get_rect()
-        btn_ok.rect.x, btn_ok.rect.y = 650, 520
+        btn_ok.rect.x, btn_ok.rect.y = 650, 525
         group.add(btn_ok)
         group.draw(s)
+
+        arrows = pygame.sprite.Group()
+        btn_right = pygame.sprite.Sprite()
+        btn_right.image = pygame.image.load("data\\interface_images\\arrow_right.png")
+        btn_right.rect = btn_right.image.get_rect()
+        btn_right.rect.x, btn_right.rect.y = 650, 330
+        btn_right.name = "+"
+        arrows.add(btn_right)
+
+        btn_left = pygame.sprite.Sprite()
+        btn_left.image = pygame.image.load("data\\interface_images\\arrow_left.png")
+        btn_left.rect = btn_left.image.get_rect()
+        btn_left.rect.x, btn_left.rect.y = 310, 330
+        btn_left.name = "-"
+        arrows.add(btn_left)
+        arrows.draw(s)
+
+        character = pygame.sprite.Group()
+        im2 = pygame.sprite.Sprite()
+        im2.image = pygame.transform.scale(load_image(IMAGE_UNITS[squad[int(spr.name) - 1]]), (200, 300))
+        im2.rect = im2.image.get_rect()
+        im2.rect.x, im2.rect.y = 375, 170
+        character.add(im2)
 
         self.screen.blit(s, (0, 0))
 
         while True:
+            im2.image = pygame.transform.scale(load_image(IMAGE_UNITS[squad[int(spr.name) - 1]]), (200, 300))
+            character.draw(s)
+            self.screen.blit(s, (0, 0))
+
             for event in pygame.event.get():
                 pos = pygame.mouse.get_pos()
                 if event.type == pygame.QUIT:
                     return -1
+                for el in arrows:
+                    if el.rect.collidepoint(pos) and event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                        a = squad[int(spr.name) - 1]
+                        fl = False
+                        if el.name == "+":
+                            for key in list(IMAGE_UNITS.keys()):
+                                if fl:
+                                    squad[int(spr.name) - 1] = key
+                                    fl = False
+                                if key == a:
+                                    fl = True
+                            if a == squad[int(spr.name) - 1]:
+                                squad[int(spr.name) - 1] = list(IMAGE_UNITS.keys())[0]
+                        if el.name == "-":
+                            sp = list(IMAGE_UNITS.keys())
+                            for key in sp[::-1]:
+                                if fl:
+                                    squad[int(spr.name) - 1] = key
+                                    fl = False
+                                if key == a:
+                                    fl = True
+                            if a == squad[int(spr.name) - 1]:
+                                squad[int(spr.name) - 1] = list(IMAGE_UNITS.keys())[-1]
                 for elem in group:
                     if elem.rect.collidepoint(pos) and event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                         return
 
-            group.draw(s)
+            self.screen.blit(s, (0, 0))
             pygame.display.flip()

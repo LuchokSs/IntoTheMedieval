@@ -33,4 +33,6 @@ UNITS = {'warrior': ".\\data\\units\\warrior\\unit.json",
          'tower': '.\\data\\units\\tower\\unit.json',
          'wizard': '.\\data\\units\\wizard\\unit.json'}
 
-squad = ['warrior', 'wizard', 'shield']
+squad = ['warrior', 'warrior', 'warrior']
+
+IMAGE_UNITS = {'warrior': ".\\data\\units\\unit1.png", 'shield': ".\\data\\units\\unit2.png", 'archer': ".\\data\\units\\unit3.png"}
