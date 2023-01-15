@@ -36,3 +36,7 @@ UNITS = {'warrior': ".\\data\\units\\warrior\\unit.json",
 squad = ['warrior', 'warrior', 'warrior']
 
 IMAGE_UNITS = {'warrior': ".\\data\\units\\unit1.png", 'shield': ".\\data\\units\\unit2.png", 'archer': ".\\data\\units\\unit3.png"}
+
+# файл с имеющимися у игрока юнитами
+with open('data\\units\\available_units.txt', "r+") as units_file:
+    available_units = units_file.read().split()
