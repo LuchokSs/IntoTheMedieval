@@ -9,6 +9,9 @@ from chestClass import chest_screen
 
 if __name__ == '__main__':
     pygame.init()
+    pygame.display.set_caption("Into The Medieval")
+    icon = pygame.image.load(".\\data\\interface_images\\icon.png")
+    pygame.display.set_icon(icon)
     main_screen = pygame.display.set_mode(FIELD_SIZE)
 
     running = True
