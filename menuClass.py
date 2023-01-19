@@ -1,14 +1,16 @@
 import pygame
 from secondary import load_image
-from globals import MODES, IMAGE_UNITS, squad
+from globals import MODES, IMAGE_UNITS, squad, available_units, FIELD_SIZE, DESCRIPTION_UNITS
 
 
 def start_screen(main_screen):
+    "ф-ия запуска стартового окна"
     game = Menu()
 
     while True:
         pos = pygame.mouse.get_pos()
-        main_screen.fill((0, 100, 200))
+        main_screen.blit(pygame.transform.scale(load_image(".\\data\\interface_images\\background.png"), FIELD_SIZE),
+                         (0, 0))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -34,9 +36,10 @@ def start_screen(main_screen):
 
 
 class Menu:
+    "класс стартового окна"
     def __init__(self):
         pygame.font.init()
-        self.main_font = pygame.font.Font(None, 48)
+        self.main_font = pygame.font.Font(None, 70)
         self.all_sprites = pygame.sprite.Group()
 
         sprite = pygame.sprite.Sprite()
@@ -54,36 +57,49 @@ class Menu:
         self.all_sprites.add(sprite)
 
     def render(self, elem):
+        "ф-ия подсвечивает выделенную кнопку"
         return self.main_font.render(elem.name, 1, (250, 30, 250))
 
     def render_selected(self, elem):
+        "ф-ия возвращает кнопку в нейтральное положение"
         return self.main_font.render(elem.name, 1, (250, 250, 30))
 
 
 class SecondPhase:
+    "Класс второго этапа меню. Выбор отряда"
     def __init__(self, screen):
         self.screen = screen
         self.main_font = pygame.font.Font(None, 36)
 
     def show_win(self):
+        "ф-ия запуска второго этапа меню"
         characters = pygame.sprite.Group()
 
         sprite = pygame.sprite.Sprite()
-        sprite.image = pygame.transform.scale(load_image(IMAGE_UNITS[squad[0]]), (100, 150))
+        im = load_image(IMAGE_UNITS[squad[0]])
+        im.set_colorkey((0, 0, 0))
+        im.set_alpha()
+        sprite.image = pygame.transform.scale(im, (150, 150))
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x, sprite.rect.y = 600, 100
         sprite.name = "1"
         characters.add(sprite)
 
         sprite = pygame.sprite.Sprite()
-        sprite.image = pygame.transform.scale(load_image(IMAGE_UNITS[squad[1]]), (100, 150))
+        im = load_image(IMAGE_UNITS[squad[1]])
+        im.set_colorkey((0, 0, 0))
+        im.set_alpha()
+        sprite.image = pygame.transform.scale(im, (150, 150))
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x, sprite.rect.y = 600, 280
         sprite.name = "2"
         characters.add(sprite)
 
         sprite = pygame.sprite.Sprite()
-        sprite.image = pygame.transform.scale(load_image(IMAGE_UNITS[squad[2]]), (100, 150))
+        im = load_image(IMAGE_UNITS[squad[2]])
+        im.set_colorkey((0, 0, 0))
+        im.set_alpha()
+        sprite.image = pygame.transform.scale(im, (150, 150))
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x, sprite.rect.y = 600, 460
         sprite.name = "3"
@@ -98,18 +114,41 @@ class SecondPhase:
         btn.add(sprite)
 
         while True:
-            self.screen.fill((0, 100, 200))
+            self.screen.fill((135, 181, 122))
+
+            self.screen.blit(pygame.transform.scale(load_image(".\\data\\interface_images\\background.png"),
+                                                    (530, 530)), (30, 90))
+
+            font = pygame.font.Font(None, 30)
             image1 = pygame.Surface([400, 170])
-            image1.fill("green")
+            image1.fill((189, 198, 164))
             self.screen.blit(image1, (590, 90))
+            text = DESCRIPTION_UNITS[squad[0]]
+            text_coord = 90
+            for line in text:
+                string_rendered = font.render(line, 1, pygame.Color('black'))
+                text_coord += 20
+                self.screen.blit(string_rendered, (740, text_coord))
 
             image2 = pygame.Surface([400, 170])
-            image2.fill("green")
+            image2.fill((189, 198, 164))
             self.screen.blit(image2, (590, 270))
+            text = DESCRIPTION_UNITS[squad[1]]
+            text_coord = 270
+            for line in text:
+                string_rendered = font.render(line, 1, pygame.Color('black'))
+                text_coord += 20
+                self.screen.blit(string_rendered, (740, text_coord))
 
             image3 = pygame.Surface([400, 170])
-            image3.fill("green")
+            image3.fill((189, 198, 164))
             self.screen.blit(image3, (590, 450))
+            text = DESCRIPTION_UNITS[squad[2]]
+            text_coord = 450
+            for line in text:
+                string_rendered = font.render(line, 1, pygame.Color('black'))
+                text_coord += 20
+                self.screen.blit(string_rendered, (740, text_coord))
             pos = pygame.mouse.get_pos()
 
             characters.draw(self.screen)
@@ -120,8 +159,10 @@ class SecondPhase:
                 for elem in characters:
                     if elem.rect.collidepoint(pos) and event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                         self.character_selection(elem)
-                        elem.image = pygame.transform.scale(load_image(IMAGE_UNITS[squad[int(elem.name) - 1]]),
-                                                            (100, 150))
+                        im = load_image(IMAGE_UNITS[squad[int(elem.name) - 1]])
+                        im.set_colorkey((0, 0, 0))
+                        im.set_alpha()
+                        elem.image = pygame.transform.scale(im, (150, 150))
                 for elem in btn:
                     if elem.rect.collidepoint(pos) and event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                         return 1
@@ -130,10 +171,11 @@ class SecondPhase:
             pygame.display.flip()
 
     def character_selection(self, spr):
+        "ф-ия выбора юнита в отряд"
         global squad
-        s = pygame.Surface((1000, 700))
-        s.fill((0, 0, 0))
-        s.set_alpha(100)
+        s = pygame.Surface(FIELD_SIZE)
+        s.blit(pygame.transform.scale(load_image(".\\data\\interface_images\\background.png"), FIELD_SIZE),
+               (0, 0))
         pygame.draw.rect(s, (255, 255, 255), (300, 150, 400, 400), 0)
 
         group = pygame.sprite.Group()
@@ -162,16 +204,31 @@ class SecondPhase:
 
         character = pygame.sprite.Group()
         im2 = pygame.sprite.Sprite()
-        im2.image = pygame.transform.scale(load_image(IMAGE_UNITS[squad[int(spr.name) - 1]]), (200, 300))
+        im = load_image(IMAGE_UNITS[squad[int(spr.name) - 1]])
+        im.set_colorkey((0, 0, 0))
+        im.set_alpha()
+        im2.image = pygame.transform.scale(im, (300, 300))
         im2.rect = im2.image.get_rect()
-        im2.rect.x, im2.rect.y = 375, 170
+        im2.rect.x, im2.rect.y = 340, 170
         character.add(im2)
 
         self.screen.blit(s, (0, 0))
 
         while True:
-            im2.image = pygame.transform.scale(load_image(IMAGE_UNITS[squad[int(spr.name) - 1]]), (200, 300))
+            im = load_image(IMAGE_UNITS[squad[int(spr.name) - 1]])
+            im.set_colorkey((0, 0, 0))
+            im.set_alpha()
+            im2.image = pygame.transform.scale(im, (300, 300))
             character.draw(s)
+
+            font = pygame.font.Font(None, 30)
+            text = DESCRIPTION_UNITS[squad[int(spr.name) - 1]]
+            text_coord = 740
+            for line in text:
+                string_rendered = font.render(line, 1, pygame.Color('black'))
+                text_coord += 20
+                s.blit(string_rendered, (170, text_coord))
+
             self.screen.blit(s, (0, 0))
 
             for event in pygame.event.get():
@@ -183,7 +240,7 @@ class SecondPhase:
                         a = squad[int(spr.name) - 1]
                         fl = False
                         if el.name == "+":
-                            for key in list(IMAGE_UNITS.keys()):
+                            for key in available_units:
                                 if fl:
                                     squad[int(spr.name) - 1] = key
                                     fl = False
@@ -192,7 +249,7 @@ class SecondPhase:
                             if a == squad[int(spr.name) - 1]:
                                 squad[int(spr.name) - 1] = list(IMAGE_UNITS.keys())[0]
                         if el.name == "-":
-                            sp = list(IMAGE_UNITS.keys())
+                            sp = available_units
                             for key in sp[::-1]:
                                 if fl:
                                     squad[int(spr.name) - 1] = key
