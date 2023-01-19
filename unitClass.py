@@ -1,64 +1,27 @@
-import random
-
-from secondary import load_image, good_cell
+from secondary import load_image, good_cell, new_unit
 from globals import MOVEMENT_TYPES, HOUSE_DAMAGED_EVENT
+from fieldClass import Field
 import pygame
 
 
-def move_content(cell1, cell2):
-    cell1.content, cell2.content = cell2.content, cell1.content
-
-
 class Unit:
-    health = 0
-    attack_range = 0
-    movement_range = 0
-    movement_type = MOVEMENT_TYPES['grounded']
-    name = ''
-    image = ''
-    turns_left = {'move': True, 'spell': True}
+    def __init__(self):
+        self.health = 0
+        self.attack_range = 0
+        self.movement_range = 0
+        self.movement_type = MOVEMENT_TYPES['grounded']
+        self.name = ''
+        self.image = ''
+        self.turns_left = {'move': True, 'spell': True}
 
     def get_image(self):
         return load_image(self.image, colorkey='black')
 
 
-class EnemyWarrior:
-    movement_range = 3
-    image = '.\\data\\units\\warrior\\unit.json'
-    target = None
-
-    def move(self, field, curr_cell):
-        cells = []
-        pos = curr_cell.crds
-        for row in field:
-            for cell in row:
-                if cell.content is not EnemyWarrior and cell.content is not None:
-                    cells.append(cell)
-        for cell in cells:
-            pos1 = cell.crds
-            if ((pos[0] - pos1[1]) ** 2 + (pos[1] - pos1[0]) ** 2) ** 0.5 <= self.movement_range:
-                move_content(pos, pos1)
-                self.target = (pos1[0] - pos[0], pos1[1] - pos[1])
-                break
-        else:
-            while True:
-                dx, dy = random.randint(-3, 3), random.randint(-3, 1)
-                if field[pos[0] + dx][pos[1] + dy].cell_type_id == 0 and dx != dy != 0:
-                    move_content(pos, field[pos[0] + dx][pos[1] + dy])
-                    break
-
-    def attack(self, field, pos):
-        target_pos = (pos[0] + self.target[0], pos[1] + self.target[1])
-        target_cell = field[target_pos[0]][target_pos[1]]
-        if target_cell.cell_type_id == 2:
-            event = HOUSE_DAMAGED_EVENT
-            event.pos = target_cell.crds
-            pygame.event.post(event)
-        if target_cell.content is Unit:
-            target_cell.content.health -= 2
-
-
 class Warrior(Unit):
+    def __init__(self):
+        super().__init__()
+
     def show_spellrange(self, field, pos):
         field[pos[0] + 1][pos[1]].marked = True
         field[pos[0]][pos[1] + 1].marked = True
@@ -96,6 +59,9 @@ class Warrior(Unit):
 
 
 class Archer(Unit):
+    def __init__(self):
+        super().__init__()
+
     def show_spellrange(self, field, pos):
         num = 0
         while pos[0] + num < 10:
@@ -137,7 +103,7 @@ class Archer(Unit):
                     field[x + num][y].content.health -= 2
                     if x + num + 1 < 10:
                         if good_cell(field[x + num + 1][y]):
-                            move_content(field[x + num][y], field[x + num + 1][y])
+                            Field.move_content(1, field[x + num][y], field[x + num + 1][y])
                         break
                 if field[x + num][y].cell_type_id == 2:
                     event.pos.append([x + num, y])
@@ -149,7 +115,7 @@ class Archer(Unit):
                     field[x - num][y].content.health -= 2
                     if x - num - 1 > -10:
                         if good_cell(field[x - num - 1][y]):
-                            move_content(field[x - num][y], field[x - num - 1][y])
+                            Field.move_content(1, field[x - num][y], field[x - num - 1][y])
                         break
                 if field[x - num][y].cell_type_id == 2:
                     event.pos.append([x - num, y])
@@ -163,7 +129,7 @@ class Archer(Unit):
                     field[x][y + num].content.health -= 2
                     if y + num + 1 < 10:
                         if good_cell(field[x][y + num + 1]):
-                            move_content(field[x][y + num], field[x][y + num + 1])
+                            Field.move_content(1, field[x][y + num], field[x][y + num + 1])
                         break
                 if field[x][y + num].cell_type_id == 2:
                     event.pos.append([x, y + num])
@@ -175,7 +141,7 @@ class Archer(Unit):
                     field[x][y - num].content.health -= 2
                     if y - num - 1 > -10:
                         if good_cell(field[x][y - num - 1]):
-                            move_content(field[x][y - num], field[x][y - num - 1])
+                            Field.move_content(1, field[x][y - num], field[x][y - num - 1])
                         break
                 if field[x][y - num].cell_type_id == 2:
                     event.pos.append([x, y - num])
@@ -225,6 +191,9 @@ class Archer(Unit):
 
 
 class Shield(Unit):
+    def __init__(self):
+        super().__init__()
+
     def show_spellrange(self, field, pos):
         if good_cell(field[pos[0] + 1][pos[1]]):
             field[pos[0] + 1][pos[1]].marked = True
@@ -241,12 +210,12 @@ class Shield(Unit):
             num = 1
             if field[x + num][y].content is not None and x + num + 1 < 10:
                 if good_cell(field[x + num + 1][y]):
-                    move_content(field[x + num][y], field[x + num + 1][y])
+                    Field.move_content(1, field[x + num][y], field[x + num + 1][y])
                 else:
                     field[x + num][y].content.health -= 1
             elif field[x - num][y].content is not None and x - num - 1 >= 0:
                 if good_cell(field[x - num - 1][y]):
-                    move_content(field[x - num][y], field[x - num - 1][y])
+                    Field.move_content(1, field[x - num][y], field[x - num - 1][y])
                 else:
                     field[x - num][y].content.health -= 1
         elif pos.crds[0] == unit.crds[0]:
@@ -254,12 +223,12 @@ class Shield(Unit):
             num = 1
             if field[x][y + num].content is not None and y + num + 1 < 10:
                 if good_cell(field[x][y + num + 1]):
-                    move_content(field[x][y + num], field[x][y + num + 1])
+                    Field.move_content(1, field[x][y + num], field[x][y + num + 1])
                 else:
                     field[x][y + num].content.health -= 1
             elif field[x][y - num].content is not None and y - num - 1 >= 0:
                 if good_cell(field[x][y - num - 1]):
-                    move_content(field[x][y - num], field[x][y - num - 1])
+                    Field.move_content(1, field[x][y - num], field[x][y - num - 1])
                 else:
                     field[x][y - num].content.health -= 1
 
@@ -297,6 +266,9 @@ class Shield(Unit):
 
 
 class Hiller(Unit):
+    def __init__(self):
+        super().__init__()
+
     def show_spellrange(self, field, pos):
         for num in range(3):
             if good_cell(field[pos[0] + num][pos[1]]):
@@ -371,6 +343,9 @@ class Hiller(Unit):
 
 
 class Tower(Unit):
+    def __init__(self):
+        super().__init__()
+
     def mark_range(self, field, range, curr_cell):
         if range == 0:
             return
@@ -398,6 +373,9 @@ class Tower(Unit):
 
 
 class Wizard(Unit):
+    def __init__(self):
+        super().__init__()
+
     def show_spellrange(self, field, pos):
         for i in range(10):
             for j in range(10):
@@ -408,7 +386,7 @@ class Wizard(Unit):
         x, y = pos.crds
         i, j = unit.crds
         if field[x][y].marked:
-            move_content(field[x][y], field[i][j])
+            Field.move_content(1, field[x][y], field[i][j])
 
     def cell_under_attack(self, pos, field, cell):
         x, y = pos.crds
