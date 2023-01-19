@@ -1,6 +1,6 @@
 import pygame
 from secondary import load_image, pil_image_to_surface
-from globals import EXIT_MENU_EVENT, MOVING_UNIT_EVENT, SPELLCAST_UNIT_EVENT
+from globals import EXIT_MENU_EVENT, MOVING_UNIT_EVENT, SPELLCAST_UNIT_EVENT, NEXT_TURN_EVENT
 
 
 class Interface:
@@ -33,6 +33,10 @@ class Interface:
         self.images["spell_icon"].image = load_image('data\\interface_images\\empty_spell_icon.png', colorkey='black')
         self.images["spell_icon"].rect = pygame.rect.Rect(10, 600, 450, 300)
 
+        self.images["next"] = pygame.sprite.Sprite(self.interface_sprites)
+        self.images["next"].image = load_image('data\\interface_images\\next.png', colorkey='black')
+        self.images["next"].rect = pygame.rect.Rect(860, 570, 100, 300)
+
     def update(self):
         self.images['player_healthBar'].image = \
             load_image(f'data\\interface_images\\player_healthBar{5 - self.player_healthBar_status}.png',
@@ -42,6 +46,8 @@ class Interface:
     def interface_clicked(self, pos):
         if self.images['exit_button'].rect.collidepoint(pos):
             pygame.event.post(EXIT_MENU_EVENT)
+        if self.images['next'].rect.collidepoint(pos):
+            pygame.event.post(NEXT_TURN_EVENT)
 
     def unit_management(self, pos, cell):
         if self.images['moving_icon'].rect.collidepoint(pos) and cell.content.turns_left['move']:

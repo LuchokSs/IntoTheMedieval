@@ -24,6 +24,7 @@ EXIT_MENU_EVENT = pygame.event.Event(pygame.USEREVENT + 1)
 MOVING_UNIT_EVENT = pygame.event.Event(pygame.USEREVENT + 2)
 SPELLCAST_UNIT_EVENT = pygame.event.Event(pygame.USEREVENT + 3)
 HOUSE_DAMAGED_EVENT = pygame.event.Event(pygame.USEREVENT + 4)
+NEXT_TURN_EVENT = pygame.event.Event(pygame.USEREVENT + 5)
 
 DESCRIPTION_UNITS = {'warrior': ["Обычный воин, атакует", "на 3 клетки в ряд,", "но будьте осторожны, ",
                                 "при необдуманной атаке", "он может сломать дом!"],

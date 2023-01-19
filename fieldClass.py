@@ -3,7 +3,7 @@ import copy
 
 from cellClass import Cell
 from globals import squad, UNITS, CELL_SIZE, EXIT_MENU_EVENT, MOVING_UNIT_EVENT, SPELLCAST_UNIT_EVENT, CELL_TYPES
-from globals import HOUSE_DAMAGED_EVENT
+from globals import HOUSE_DAMAGED_EVENT, NEXT_TURN_EVENT
 import json_tricks as json
 from interfaceClass import Interface
 from secondary import load_image
@@ -54,12 +54,9 @@ def field_mode(main_screen, *args, **kwargs):
         pygame.display.flip()
 
         if STAGE == 0:
-            board.attack_enemies()
             board.summon_enemies()
-            if len(board.enemy_list) == 0:
+            if len(board.enemy_list) < 3 + STAGE:
                 board.generate_enemy(3)
-            board.prepare_enemies()
-
             STAGE = 1
 
         if STAGE == 1:
@@ -68,6 +65,17 @@ def field_mode(main_screen, *args, **kwargs):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     return 3
+                if event == NEXT_TURN_EVENT:
+                    print('a')
+                    STAGE = 0
+                    for row in board.field:
+                        for cell in row:
+                            try:
+                                cell.content.turns_left['move'] = True
+                                cell.content.turns_left['attack'] = True
+                            except Exception:
+                                continue
+                    break
                 if event == HOUSE_DAMAGED_EVENT:
                     for pos in event.pos:
                         cell = board.field[pos[0]][pos[1]]
@@ -188,10 +196,10 @@ class Field:
             cell.tick = 0
             LAST_CLICKED = cell
 
-            if cell.content is not None:
+            if cell.content is not None and cell.content.name != 'e':
                 self.interface.show_unit_interface(cell.content)
 
-        if LAST_CLICKED is not None and LAST_CLICKED.content is not None:
+        if LAST_CLICKED is not None and LAST_CLICKED.content is not None and LAST_CLICKED.content.name != 'e':
             self.interface.unit_management(pos, LAST_CLICKED)
 
         self.interface.interface_clicked(pos)
@@ -231,8 +239,10 @@ class Field:
                     self.enemy_list.append(cell.content)
 
     def prepare_enemies(self):
-        for unit in self.enemy_list:
-            unit.move()
+        for row in self.field:
+            for cell in row:
+                if cell.content in self.enemy_list:
+                    cell.content.move(self.field, cell)
 
     def attack_enemies(self):
         for row in self.field:
