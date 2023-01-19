@@ -17,10 +17,6 @@ class Unit:
         return load_image(self.image, colorkey='black')
 
 
-class EnemyWarrior(Unit):
-    pass
-
-
 class Warrior(Unit):
     def show_spellrange(self, field, pos):
         field[pos[0] + 1][pos[1]].marked = True

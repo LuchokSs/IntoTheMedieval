@@ -6,7 +6,7 @@ from globals import HOUSE_DAMAGED_EVENT
 import json_tricks as json
 from interfaceClass import Interface
 from secondary import load_image
-from unitClass import EnemyWarrior
+from enemyUnits import EnemyWarrior
 
 import pygame
 
