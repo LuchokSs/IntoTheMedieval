@@ -2,6 +2,7 @@ from secondary import load_image, good_cell
 from globals import MOVEMENT_TYPES, HOUSE_DAMAGED_EVENT
 from fieldClass import Field
 import pygame
+import random
 
 
 class Unit:
@@ -17,8 +18,40 @@ class Unit:
         return load_image(self.image, colorkey='black')
 
 
-class EnemyWarrior(Unit):
-    pass
+class EnemyWarrior:
+    movement_range = 3
+    image = '.\\data\\units\\warrior\\unit.json'
+    target = None
+
+    def move(self, field, curr_cell):
+        cells = []
+        pos = curr_cell.crds
+        for row in field:
+            for cell in row:
+                if cell.content is not EnemyWarrior and cell.content is not None:
+                    cells.append(cell)
+        for cell in cells:
+            pos1 = cell.crds
+            if ((pos[0] - pos1[1]) ** 2 + (pos[1] - pos1[0]) ** 2) ** 0.5 <= self.movement_range:
+                Field.move_content(pos, pos1)
+                self.target = (pos1[0] - pos[0], pos1[1] - pos[1])
+                break
+        else:
+            while True:
+                dx, dy = random.randint(-3, 3), random.randint(-3, 1)
+                if field[pos[0] + dx][pos[1] + dy].cell_type_id == 0 and dx != dy != 0:
+                    Field.move_content(pos, field[pos[0] + dx][pos[1] + dy])
+                    break
+
+    def attack(self, field, pos):
+        target_pos = (pos[0] + self.target[0], pos[1] + self.target[1])
+        target_cell = field[target_pos[0]][target_pos[1]]
+        if target_cell.cell_type_id == 2:
+            event = HOUSE_DAMAGED_EVENT
+            event.pos = target_cell.crds
+            pygame.event.post(event)
+        if target_cell.content is Unit:
+            target_cell.content.health -= 2
 
 
 class Warrior(Unit):
