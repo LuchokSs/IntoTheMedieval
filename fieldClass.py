@@ -1,4 +1,5 @@
 import random
+import copy
 
 from cellClass import Cell
 from globals import squad, UNITS, CELL_SIZE, EXIT_MENU_EVENT, MOVING_UNIT_EVENT, SPELLCAST_UNIT_EVENT, CELL_TYPES
@@ -77,12 +78,16 @@ def field_mode(main_screen, *args, **kwargs):
                             if board.player_health == 0:
                                 return 2
                 if event == MOVING_UNIT_EVENT:
+                    print(LAST_CLICKED.content)
+                    print(id(LAST_CLICKED.content.turns_left))
                     if not LAST_CLICKED.content.turns_left['move']:
                         pass
                     board.mark_range(LAST_CLICKED.content.movement_range, LAST_CLICKED.crds, first=True)
                     moving_phase = True
                     LAST_CLICKED.content.turns_left['move'] = False
                 if event == SPELLCAST_UNIT_EVENT:
+                    print(LAST_CLICKED.content)
+                    print(id(LAST_CLICKED.content.turns_left))
                     if not LAST_CLICKED.content.turns_left['spell']:
                         pass
                     LAST_CLICKED.content.show_spellrange(board.field, LAST_CLICKED.crds)
@@ -203,6 +208,7 @@ class Field:
         if (marked and cell.marked and cell.content is None) or not marked:
             with open(UNITS[unit_name], "r") as file:
                 cell.content = json.load(file)
+                cell.content = copy.deepcopy(cell.content)
                 return True
         return False
 

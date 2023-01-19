@@ -1,1 +1,1 @@
-{"__instance_type__": ["unitClass", "Wizard"], "attributes": {"name": "wizard", "health": 3, "movement_range": 3, "attack_range": 2, "image": ".\\data\\units\\wizard\\image.png"}}
+{"__instance_type__": ["unitClass", "Wizard"], "attributes": {"health": 3, "attack_range": 2, "movement_range": 3, "movement_type": 0, "name": "wizard", "image": ".\\data\\units\\wizard\\image.png", "turns_left": {"move": true, "spell": true}}}

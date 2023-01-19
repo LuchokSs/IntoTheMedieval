@@ -1,23 +1,27 @@
-from secondary import load_image, good_cell
+from secondary import load_image, good_cell, new_unit
 from globals import MOVEMENT_TYPES, HOUSE_DAMAGED_EVENT
 from fieldClass import Field
 import pygame
 
 
 class Unit:
-    health = 0
-    attack_range = 0
-    movement_range = 0
-    movement_type = MOVEMENT_TYPES['grounded']
-    name = ''
-    image = ''
-    turns_left = {'move': True, 'spell': True}
+    def __init__(self):
+        self.health = 0
+        self.attack_range = 0
+        self.movement_range = 0
+        self.movement_type = MOVEMENT_TYPES['grounded']
+        self.name = ''
+        self.image = ''
+        self.turns_left = {'move': True, 'spell': True}
 
     def get_image(self):
         return load_image(self.image, colorkey='black')
 
 
 class Warrior(Unit):
+    def __init__(self):
+        super().__init__()
+
     def show_spellrange(self, field, pos):
         field[pos[0] + 1][pos[1]].marked = True
         field[pos[0]][pos[1] + 1].marked = True
@@ -55,6 +59,9 @@ class Warrior(Unit):
 
 
 class Archer(Unit):
+    def __init__(self):
+        super().__init__()
+
     def show_spellrange(self, field, pos):
         num = 0
         while pos[0] + num < 10:
@@ -184,6 +191,9 @@ class Archer(Unit):
 
 
 class Shield(Unit):
+    def __init__(self):
+        super().__init__()
+
     def show_spellrange(self, field, pos):
         if good_cell(field[pos[0] + 1][pos[1]]):
             field[pos[0] + 1][pos[1]].marked = True
@@ -256,6 +266,9 @@ class Shield(Unit):
 
 
 class Hiller(Unit):
+    def __init__(self):
+        super().__init__()
+
     def show_spellrange(self, field, pos):
         for num in range(3):
             if good_cell(field[pos[0] + num][pos[1]]):
@@ -330,6 +343,9 @@ class Hiller(Unit):
 
 
 class Tower(Unit):
+    def __init__(self):
+        super().__init__()
+
     def mark_range(self, field, range, curr_cell):
         if range == 0:
             return
@@ -357,6 +373,9 @@ class Tower(Unit):
 
 
 class Wizard(Unit):
+    def __init__(self):
+        super().__init__()
+
     def show_spellrange(self, field, pos):
         for i in range(10):
             for j in range(10):

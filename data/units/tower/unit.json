@@ -1,1 +1,1 @@
-{"__instance_type__": ["unitClass", "Tower"], "attributes": {"name": "tower", "health": 4, "movement_range": 0, "attack_range": 6, "image": ".\\data\\units\\tower\\image.png"}}
+{"__instance_type__": ["unitClass", "Tower"], "attributes": {"health": 3, "attack_range": 2, "movement_range": 3, "movement_type": 0, "name": "tower", "image": ".\\data\\units\\tower\\image.png", "turns_left": {"move": true, "spell": true}}}
