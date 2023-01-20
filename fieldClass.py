@@ -66,7 +66,6 @@ def field_mode(main_screen, *args, **kwargs):
                 if event.type == pygame.QUIT:
                     return 3
                 if event == NEXT_TURN_EVENT:
-                    print('a')
                     STAGE = 0
                     for row in board.field:
                         for cell in row:
@@ -86,16 +85,12 @@ def field_mode(main_screen, *args, **kwargs):
                             if board.player_health == 0:
                                 return 2
                 if event == MOVING_UNIT_EVENT:
-                    print(LAST_CLICKED.content)
-                    print(id(LAST_CLICKED.content.turns_left))
                     if not LAST_CLICKED.content.turns_left['move']:
                         pass
                     board.mark_range(LAST_CLICKED.content.movement_range, LAST_CLICKED.crds, first=True)
                     moving_phase = True
                     LAST_CLICKED.content.turns_left['move'] = False
                 if event == SPELLCAST_UNIT_EVENT:
-                    print(LAST_CLICKED.content)
-                    print(id(LAST_CLICKED.content.turns_left))
                     if not LAST_CLICKED.content.turns_left['spell']:
                         pass
                     LAST_CLICKED.content.show_spellrange(board.field, LAST_CLICKED.crds)

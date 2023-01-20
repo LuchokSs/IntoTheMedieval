@@ -12,6 +12,10 @@ if __name__ == '__main__':
     pygame.display.set_caption("Into The Medieval")
     icon = pygame.image.load(".\\data\\interface_images\\icon.png")
     pygame.display.set_icon(icon)
+
+    pygame.mixer.music.load(".\\data\\music\\aknightarrivesincancoonvillage.mp3")
+    pygame.mixer.music.play(-1)
+
     main_screen = pygame.display.set_mode(FIELD_SIZE)
 
     running = True
