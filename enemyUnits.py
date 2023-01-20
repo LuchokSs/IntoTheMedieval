@@ -39,6 +39,5 @@ class EnemyWarrior:
                 except IndexError:
                     continue
 
-
     def get_image(self):
         return load_image(self.image, colorkey='black')

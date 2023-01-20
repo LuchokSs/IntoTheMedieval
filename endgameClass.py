@@ -1,5 +1,6 @@
 import pygame
-from globals import MODES
+from secondary import load_image
+from globals import MODES, FIELD_SIZE
 
 
 def end_screen(main_screen, isOpened):
@@ -33,7 +34,8 @@ class EndgameMenu:
         pygame.font.init()
         self.main_font = pygame.font.Font(None, 48)
         self.all_sprites = pygame.sprite.Group()
-        main_screen.fill((0, 100, 200))
+        main_screen.blit(pygame.transform.scale(load_image(".\\data\\interface_images\\background.png"), FIELD_SIZE),
+                         (0, 0))
 
         sprite = pygame.sprite.Sprite()
         if isOpened:
