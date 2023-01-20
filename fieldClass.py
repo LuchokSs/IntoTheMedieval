@@ -55,8 +55,8 @@ def field_mode(main_screen, *args, **kwargs):
 
         if STAGE == 0:
             board.summon_enemies()
-            if len(board.enemy_list) < 3 + STAGE:
-                board.generate_enemy(3)
+            if len(board.enemy_list) < 3:
+                board.generate_enemy(3 - len(board.enemy_list))
             STAGE = 1
 
         if STAGE == 1:
