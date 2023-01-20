@@ -224,6 +224,7 @@ class SecondPhase:
         self.screen.blit(s, (0, 0))
 
         while True:
+            pygame.draw.rect(s, (255, 255, 255), (300, 150, 400, 400), 0)
             im = load_image(IMAGE_UNITS[squad[int(spr.name) - 1]])
             im.set_colorkey((0, 0, 0))
             im.set_alpha()
@@ -256,7 +257,7 @@ class SecondPhase:
                                 if key == a:
                                     fl = True
                             if a == squad[int(spr.name) - 1]:
-                                squad[int(spr.name) - 1] = list(IMAGE_UNITS.keys())[0]
+                                squad[int(spr.name) - 1] = available_units[0]
                         if el.name == "-":
                             sp = available_units
                             for key in sp[::-1]:
@@ -266,10 +267,13 @@ class SecondPhase:
                                 if key == a:
                                     fl = True
                             if a == squad[int(spr.name) - 1]:
-                                squad[int(spr.name) - 1] = list(IMAGE_UNITS.keys())[-1]
+                                squad[int(spr.name) - 1] = available_units[-1]
                 for elem in group:
                     if elem.rect.collidepoint(pos) and event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                         return
 
+            arrows.draw(s)
+            group.draw(s)
+            character.draw(s)
             self.screen.blit(s, (0, 0))
             pygame.display.flip()
